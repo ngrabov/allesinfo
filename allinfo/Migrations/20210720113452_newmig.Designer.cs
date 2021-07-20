@@ -9,8 +9,8 @@ using allinfo.Data;
 namespace allinfo.Migrations
 {
     [DbContext(typeof(NewsContext))]
-    [Migration("20210615100124_rfa")]
-    partial class rfa
+    [Migration("20210720113452_newmig")]
+    partial class newmig
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -249,6 +249,9 @@ namespace allinfo.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Accolades")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("AvatarURL")
                         .HasColumnType("TEXT");
 
@@ -277,8 +280,8 @@ namespace allinfo.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("age")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("contractDetails")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("contractLength")
                         .HasColumnType("INTEGER");
@@ -400,9 +403,6 @@ namespace allinfo.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("teamAvi")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("ID");
 
                     b.HasIndex("TeamId");
@@ -458,6 +458,9 @@ namespace allinfo.Migrations
                     b.Property<string>("ShortName")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("championships")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("division")
                         .HasColumnType("INTEGER");

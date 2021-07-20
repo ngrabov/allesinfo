@@ -30,4 +30,9 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="News.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

@@ -1,0 +1,15 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskName": "task-News",
+      "appliesTo": "News.db",
+      "type": "launch"
+    },
+    {
+      "taskName": "task-News",
+      "appliesTo": "News.db",
+      "type": "launch"
+    }
+  ]
+}
