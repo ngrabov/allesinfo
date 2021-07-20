@@ -1,0 +1,90 @@
+@model allinfo.Models.Writer
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = "Details";
+    var currentUser = await userManager.GetUserAsync(User);
+    bool isAdmin;
+    if(signInManager.IsSignedIn(User) && currentUser!= null && await userManager.IsInRoleAsync(currentUser, "Administrator"))
+    {
+        isAdmin = true;
+    }
+    else
+    {
+        isAdmin = false;
+    }
+
+    <style media="screen and (max-width:600px)">
+        .ex{
+            display: none;
+        }
+    </style>
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h1 style="color: #7B0F28;">List of articles</h1>
+
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2" style="color: #7B0F28;">
+                Writer
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.FullName)
+            </dd>
+            <dt class="col-sm-2" style="color: #7B0F28;">
+                Date of Birth
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DOB)
+            </dd>
+            <dt class="col-sm-2" style="color: #7B0F28;">
+                Twitter
+            </dt>
+            <dd class="col-sm-10">
+                @if((Model.TwitterHandle != null) && (Model.TwitterHandle != " "))
+                {
+                    <a href="@Model.TwitterHandle" target="_blank"><i class="fa fa-twitter"></i></a>
+                }
+            </dd>
+            
+            <dd class="col-sm-10">
+                <table class="table">
+                    <tr style="color: #7B0F28;">
+                        <th>Headline</th>
+                        <th class="ex">Text</th>
+                        <th class="ex">Field</th>
+                    </tr>
+                    @foreach (var item in Model.Articles.Where(s => s.isModerated).OrderByDescending(s => s.TimeWritten))
+                    {
+                        <tr>
+                            <td>
+                            <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID" style="color: #7B0F28;"> @Html.DisplayFor(modelItem => item.Headline) </a>
+                            </td>
+                            <td class="ex">
+                                @Html.Raw(item.SubText)
+                            </td>
+                            <td class="ex">
+                                @Html.DisplayFor(modelItem => item.Field)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </dd>
+        </dl>
+    </div>
+    <div>
+        @if(isAdmin)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" style="color: #7B0F28;">Edit</a> @:|
+        }
+        <a asp-action="Index" style="color: #7B0F28;">Back to List</a>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</div>

@@ -1,0 +1,133 @@
+@model allinfo.Models.Player
+@using allinfo.Models
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h1>Create a player</h1>
+
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="AvatarURL" class="control-label">Select image:</label>
+                    <input type="file" name="file" aria-label="Select image:" accept="image/*" />
+                    <span asp-validation-for="AvatarURL" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DOB" class="control-label"></label>
+                    <input asp-for="DOB" class="form-control" />
+                    <span asp-validation-for="DOB" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="shirtNumber" class="control-label"></label>
+                    <input asp-for="shirtNumber" class="form-control" maxlength="2" minlength="1" data-val="true" data-val-required="Required field." />
+                    <span asp-validation-for="shirtNumber" data-valmsg-for="shirtNumber" class="text-danger field-validation-valid"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="height"></label>
+                    <input asp-for="height" name="height" class="form-control" maxlength="3" minlength="3" data-val="true" data-val-required="Height is required." /> 
+                    <span asp-validation-for="height" data-valmsg-for="height" data-valmsg-replace="true" class="text-danger field-validation-valid"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="playingPosition"></label>
+                    @{var selist = new SelectList(System.Enum.GetValues(typeof(Position)));}
+                    <select asp-for="playingPosition" class="form-control" asp-items="@selist">
+                        <option value="">--Select position--</option>
+                    </select>
+                    <span asp-validation-for="playingPosition" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Team"></label>
+                    <select asp-for="TeamId" aria-label="Team" class="form-control" asp-items="@ViewBag.teams">
+                        <option value="">--Select team--</option>
+                    </select>
+                    <span asp-validation-for="TeamId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Nationality"></label>
+                    <select asp-for="NationalityID" class="form-control" asp-items="@ViewBag.nations">
+                        <option value="">--Select nation--</option>
+                    </select>
+                    <span asp-validation-for="NationalityID" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="salary1"></label>
+                    <input asp-for="salary1" class="form-control" maxlength="8" value="0">
+                    <span asp-validation-for="salary1" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="salary2"></label>
+                    <input asp-for="salary2" class="form-control" maxlength="8" value="0">
+                    <span asp-validation-for="salary2" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="salary3"></label>
+                    <input asp-for="salary3" class="form-control" maxlength="8" value="0">
+                    <span asp-validation-for="salary3" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="salary4"></label>
+                    <input asp-for="salary4" class="form-control" maxlength="8" value="0">
+                    <span asp-validation-for="salary4" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="salary5"></label>
+                    <input asp-for="salary5" class="form-control" maxlength="8" value="0">
+                    <span asp-validation-for="salary5" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="contractOption"></label>
+                    @{var slist = new SelectList(System.Enum.GetValues(typeof(Option)));}
+                    <select asp-for="contractOption" class="form-control" asp-items="@slist">
+                        <option value="">--Select contract option--</option>
+                    </select>
+                    <span asp-validation-for="contractOption" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="faType"></label>
+                    @{var selelist = new SelectList(System.Enum.GetValues(typeof(FreeAgency)));}
+                    <select asp-for="faType" class="form-control" asp-items="@selelist">
+                        <option value="">--Select free agent type--</option>
+                    </select>
+                    <span asp-validation-for="faType" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NBA2KRating"></label>
+                    <input asp-for="NBA2KRating" name="NBA2KRating" class="form-control" maxlength="2" minlength="2" data-val="true" data-val-required="NBA2K Rating is required." /> 
+                    <span asp-validation-for="NBA2KRating" data-valmsg-for="NBA2KRating" data-valmsg-replace="true" class="text-danger field-validation-valid"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Accolades"></label>
+                    <input asp-for="Accolades" class="form-control" />
+                </div>
+                
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div style="padding-bottom: 20px;">
+        <a asp-action="Index">Back to List</a>
+    </div>
+</div>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>

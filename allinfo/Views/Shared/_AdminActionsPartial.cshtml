@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@if (signInManager.IsSignedIn(User))
+{
+    var currentUser = await userManager.GetUserAsync(User);
+
+    var isAdmin = currentUser != null && await userManager.IsInRoleAsync(currentUser, "Administrator");
+
+    if(isAdmin)
+    {
+        <a class="nex" asp-controller="ManageUsers" style="padding-left: 12px;" asp-action="Index"> Manage Users</a>
+    }
+}

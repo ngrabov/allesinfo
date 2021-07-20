@@ -1,0 +1,152 @@
+@using System.Text.RegularExpressions
+@using AngleSharp
+@using System
+@using allinfo.Data
+@inject NewsContext context
+
+@{
+    async Task<List<string>> GetResults()
+    {
+        var config = Configuration.Default.WithDefaultLoader();
+        var ctx = BrowsingContext.New(config);
+        var dogg3 = await ctx.OpenAsync("https://theathletic.com/nba/");
+        var resultrows = dogg3.QuerySelectorAll("span.pad-left-4.iblock.valign-middle").ToArray();
+        var totalsrows = dogg3.QuerySelectorAll("span.iblock.valign-middle.away-score, span.iblock.valign-middle.home-score").ToArray();
+
+        List<string> results = new List<string>();
+        for(int k = 0; k < resultrows.Count(); k++)
+        {
+            if(resultrows[k].TextContent != "")
+            {
+                results.Add(Regex.Replace(resultrows[k].TextContent, " ", String.Empty));
+            }
+            if(totalsrows[k].TextContent != "")
+            {
+                results.Add(Regex.Replace(totalsrows[k].TextContent, " ", String.Empty));
+            }
+        }
+
+        return results;
+    }
+    <style>
+        ::-webkit-scrollbar{
+            height: 5px;
+            width: 15px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ddd; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bbb; 
+        }
+        .arrow{
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            display: inline-block;
+            padding: 3px;
+        }
+        .left{
+            transform: rotate(135deg);
+            -webkit-transform: rotate(135deg);
+        }
+        .right{
+            transform: rotate(-45deg);
+            -webkit-transform: rotate(-45deg);
+            margin: 12px;
+        }
+    </style>
+    <style media="screen and (min-width: 576px)">
+        .sbar{
+            max-width: 540px;
+        }
+    </style>
+    <style media="screen and (min-width: 768px)">
+        .sbar{
+            max-width: 720px;
+        }
+    </style>
+    <style media="screen and (min-width: 992px)">
+        .sbar{
+            max-width: 960px;
+        }
+    </style>
+    <style media="screen and (min-width: 1200px)">
+        .sbar{
+            max-width: 1140px;
+        }
+    </style>
+}
+
+@{
+    var t = await GetResults();
+    int c = 0;
+}
+
+@if(t.Count != 0)
+{
+    <div style="height: 70px; background-color: white; overflow: auto; padding: 0px; z-index: 2;">
+        <div class="sbar" style="width: 100%; margin: 4px auto auto auto; overflow: auto; height: 66px; display: flex;">
+            @for(int i = 0; i < t.Count; i += 4)
+            {
+                var home = context.Teams.FirstOrDefault(c => c.ShortName == t[i]);
+                var away = context.Teams.FirstOrDefault(c => c.ShortName == t[i+2]);
+                <div style="min-width: 150px; height: 85%; vertical-align: middle; margin-right: 10px; margin-bottom: 5px; margin-left: 7px; 
+                border: solid 1px lightgrey; border-radius: 5px; display: inline-block;">
+                    <div style="padding-left: 5px; width: 100%;">
+                        <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@home.AvatarURL" 
+                        style="width: 20px; height: 20px; object-fit: cover; overflow: hidden;" alt="Error">
+                        <a asp-controller="Teams" asp-action="Details" id="@t[i]" style="background-color: #fff; 
+                        text-decoration: none; font-weight: normal;" asp-route-id="" asp-route-abb="@t[i]">@t[i]</a>   <span style="float: right; padding-right: 5px;">@t[i+1]</span>
+                    </div> 
+                    <div style="padding-left: 5px; width: 100%;">
+                        <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@away.AvatarURL" 
+                        style="width: 20px; height: 20px; object-fit: cover; overflow: hidden;" alt="Error">
+                        <a asp-controller="Teams" asp-action="Details" id="@t[i+2]" style="background-color: #fff; 
+                        text-decoration: none; font-weight: normal;" asp-route-id="" asp-route-abb="@t[i+2]">@t[i+2]</a> <span style="float: right; padding-right: 5px;">@t[i+3]</span>
+                    </div> 
+                </div>
+                @if(c == 0)
+                {
+                    int m, n;
+                    @if((Int32.TryParse(t[i+1], out m) && Int32.TryParse( t[i+3], out n)))
+                    {
+                        @if((Int32.Parse(t[i+1]) > Int32.Parse( t[i+3])))
+                        {
+                            <script>
+                                var away = document.getElementById("@t[i]");
+                                away.style.fontWeight = "bold";
+                            </script>
+                        }
+                        else
+                        {
+                            <script>
+                                var home = document.getElementById("@t[i+2]");
+                                home.style.fontWeight = "bold";
+                            </script>
+                        }
+                    }
+                }
+                @if((i+5) < t.Count)
+                {
+                    @if(t[i+3] != "" && t[i+5] == "\n" && c == 0)
+                    {
+                        c = 1;
+                        <div style="width: 30px; height: 85%; background-color: #ddd; cursor: default; margin-right: 5px;
+                        text-align: center; display: inline-block; writing-mode: vertical-lr; font-size: small; vertical-align: middle; padding-left: 7px;">Next up</div>
+                    }
+                }
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div style="height: 70px; background-color: white; overflow: auto; padding: 0px; z-index: 2;">
+        <div class="sbar" style="width: 100%; margin: 4px auto auto auto; overflow: auto; height: 66px; display: flex;">
+            <p style="width: 90%; margin: auto; text-align: center;">No games scheduled for today</p>
+        </div>
+    </div>
+}

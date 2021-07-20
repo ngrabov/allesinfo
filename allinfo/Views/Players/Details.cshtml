@@ -1,0 +1,335 @@
+@model allinfo.Models.Player
+@using Microsoft.AspNetCore.Identity
+@using System.Globalization
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = Model.FullName;
+    int i;
+    int[] arr = new int[6];
+    double[] salaries = new double[]{Model.salary1, Model.salary2, Model.salary3, Model.salary4, Model.salary5};
+    if(System.DateTime.Now.Month < 7)
+    {
+        for( i = 0; i < 6; i++)
+        {
+            arr[i] = System.DateTime.Now.Year - 1 + i;
+        }
+    }
+    else
+    {
+        for( i = 0; i < 6; i++)
+        {
+            arr[i] = System.DateTime.Now.Year + i;
+        }
+    }
+    int c = (ViewData["Art"] as List<Article>).Count;
+    var currentUser = await userManager.GetUserAsync(User);
+    string[] split = new string[]{};
+
+    if(Model.Accolades != null)
+    {
+        var acc = Model.Accolades;
+        split = acc.Split('+');
+    }
+
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+    </style>
+    
+    <style media="screen and (min-width: 768px)">
+        #mDiv{
+            top: 22%;
+            left: 0%;
+            transform: translate(0%, -50%);
+            bottom: -33px;
+        }
+        #mImg{
+            width: 100%;
+        }
+        #mRow{
+            top: 150px;
+            height: 150px;
+        }
+        #mCol{
+            height: 50px;
+        }
+    </style>
+    <style media="screen and (min-width: 992px)">
+        #mDiv{
+            top: 22px;
+            bottom: 9px;
+        }
+        #mImg{
+            width: 80%;
+            margin: auto;
+        }
+        #tImg{
+            width: 500px;
+            height: 500px;
+            right: -480px;
+            position: relative;
+            opacity: 0.2;
+            overflow: hidden;
+            top: -310px;
+        }
+    </style>
+    <style media="screen and (min-width: 1200px)">
+        #mDiv{
+            bottom: -17px;
+            top: 16px;
+        }
+        #mImg{
+            width: 70%;
+            margin-left: 70px;
+        }
+        #tImg{
+            right: -680px;
+        }
+    </style>
+    <style media="screen and (max-width: 768px)">
+        #mDiv{
+            bottom: -95px;
+            width: 250px;
+            margin: auto;
+        }
+        #mRow{
+            bottom: -88px;
+            top: 0px;
+            margin: 0px;
+            height: 100%;
+        }
+        #mImg{
+            position: relative;
+            width: 100%;
+        }
+        #mCol{
+            position: relative;
+            top: -200px;
+            padding: 0px;
+        }
+        #mText{
+            width: 99%;
+            margin: auto;
+            text-align: center;
+            font-size: x-large;
+        }
+        h4{
+            font-size: medium;
+        }
+        p{
+            font-size: medium;
+        }
+    </style>
+    <style media="screen and (max-width: 991px)">
+        #tImg{
+            display: none;
+        }
+    </style>
+    <style media="screen and (min-width: 576px)">
+        .contain{
+            padding: 20px 15px 0px 15px;
+        }
+    </style>
+    <style media="screen and (max-width: 575px)">
+        .contain{
+            padding: 20px 0px 0px 0px;
+        }
+        .row{
+            width: 100%;
+            margin: auto;
+        }
+    </style>
+}
+
+<div style="width: 100%; height: 300px; background-image: linear-gradient(to right, @Model.Team.teamColor1, @Model.Team.teamColor2)">
+    <div class="row" id="mRow" style="position: relative; left: 0;">
+        <div class="col-md-5" id="mDiv" style="position: relative;">
+            <img id="mImg" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_500,w_600/@Model.AvatarURL" 
+                class="img" style="display: block; height: auto;" alt="Error displaying the image.">
+        </div>
+        <div class="col-md-7" id="mCol" style="display: flex; transform: translate(0%, -10%);">
+            <h1 id="mText" style="color: white;">
+                @Model.shirtNumber @Model.FullName
+            </h1>
+        </div>
+    </div>
+    <div id="tImg">
+        <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_350,w_350/@Model.Team.AvatarURL" style="width: 100%; height: auto;" alt="Error displaying the image." />
+    </div>
+</div>
+
+<div style="width: 100%; height: 70px; padding: 10px; display: flex;">
+    <img src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_50,w_50/@Model.Team.AvatarURL" class="img" style="display: block; width: 50px; height: auto;" alt="Error displaying image." />
+    <a asp-controller="Teams" asp-action="Details" asp-route-id="@Model.TeamId" style="padding-left: 15px; padding-top: 10px;"> <h4>@Model.TeamName</h4></a>
+</div>
+
+<div class="contain">
+    @{
+        var articles = ViewData["Art"] as List<Article>;
+    }
+    <div class="row" style="display: flex; flex-direction: row-reverse;">
+        @if(c!=0)
+        {
+            <div class="col-sm-8" style="font-size: small; padding-top: 20px;">
+                @foreach (var item in articles.Take(1))
+                {
+                    <div style="width: 100%; height: 480px; border: solid 1px lightgrey; background-color: white;">
+                        <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID">
+                            <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_360,w_600/@item.HeadImageURL" 
+                            style="width: 100%; height: 360px; object-fit: cover; object-position: 50% 10%;" alt="Error displaying the image." />
+                        </a>
+                        <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID" onmouseover="this.style.color='green'" onmouseout="this.style.color='#7B0F28'"
+                         style="color: #7B0F28; overflow: hidden; font-size: x-large; padding: 10px; text-decoration: none;"><p style="padding: 10px;"><b>@item.Headline</b></p></a>
+                    </div>
+                }
+                @foreach (var item in articles.Skip(1))
+                {   
+                    <div style="width: 100%; height: 120px; margin-top: 10px; border: solid 1px lightgrey; background-color: white; display: flex;">
+                        <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID" style="width: 30%; height: 120px;">
+                            <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_120,w_200/@item.HeadImageURL" 
+                            style="text-decoration: none; width: 100%; height: 118px; object-fit: cover; object-position: 50% 10%;" alt="Error displaying the image." />
+                        </a>
+                        <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID" style="width: 70%; height: 120px;">
+                            <p style="padding: 10px; font-size: medium; color: #7B0F28; overflow: hidden;" 
+                            onmouseover="this.style.color='green'" onmouseout="this.style.color='#7B0F28'"><b>@item.Headline</b></p> 
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-8">
+                <p style="padding: 20px; font-size: medium;">There have been no articles to date for this player.</p>
+            </div>
+        }
+
+        <div class="col-sm-4" style="padding: 20px 5px 15px 10px; font-size: small;">
+            <div style="background-color: white; border-radius: 5px; padding: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); margin-right: 10px;">
+                <p style="text-align: center;"><b>Bio</b></p>
+                <table class="table table-hover">
+                    <tr>
+                        <td>Position</td>
+                        <td>@Model.playingPosition</td>
+                    </tr>
+                    <tr>
+                        <td>Born</td>
+                        <td>@Html.DisplayFor(modelItem => Model.DOB) (age @Model.age)</td>
+                    </tr>
+                    <tr>
+                        <td>Nationality</td>
+                        <td>@Model.nationality</td>
+                    </tr>
+                    <tr>
+                        <td>Height</td>
+                        <td>@Model.height cm</td>
+                    </tr>
+                    <tr>
+                        <td>2K rating</td>
+                        <td>@Model.NBA2KRating</td>
+                    </tr>
+                    @if(Model.Accolades != null)
+                    {
+                    <tr>
+                        <td>Accolades</td>
+                        <td>
+                            @foreach (var item in split)
+                            {
+                                <p>@item</p>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </table>
+            </div>
+
+            <div style="margin-top: 45px; background-color: white; padding: 10px; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); margin-right: 10px;">
+                <p style="text-align: center;"><b>Contract info</b></p>
+                <table class="table table-hover">
+                    <thead>
+                        <th>Season</th>
+                        <th>Salary</th>
+                    </thead>
+                    <tbody>
+                        @{
+                            int cl = Model.contractLength - 1;
+                        }
+                        @for(i = 0 ; i < 5; i++)
+                        {
+                            <tr>
+                                <td>@arr[i]-@arr[i+1]</td>
+                                <td id="@i">@salaries[i].ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                            </tr>
+                        }
+                        @if((int)Model.contractOption == 0)
+                        {
+                            <script type="text/javascript">
+                                document.getElementById(@cl).style.color = 'blue';
+                            </script>
+                        }
+                        @if((int)Model.contractOption == 1)
+                        {
+                            <script type="text/javascript">
+                                document.getElementById(@cl).style.color = 'red';
+                            </script>
+                        }
+                        @if((int)Model.contractOption == 2)
+                        {
+                            <script type="text/javascript">
+                                document.getElementById(@cl).style.color = 'red';
+                                document.getElementById(@cl - 1).style.color = 'red';
+                            </script>
+                        }
+                    </tbody>
+                </table>
+                <div style="display: flex; margin: auto; width: 95%;">
+                    <div class="square" style="margin-top: 7px;"></div> 
+                    <p style="color: blue; font-size: small; padding: 0px 14px 0px 4px;"> Player Option</p> 
+                    <div class="square" style="background-color: red; margin-top: 7px;"></div> 
+                    <p style="color: red; font-size: small; padding: 0px 4px;"> Team Option</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="padding-bottom: 20px; padding-left: 10px;">
+        <hr />
+        @if(signInManager.IsSignedIn(User))
+        {
+            @if(currentUser.isAdmin || currentUser.isModerator)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.ID" style="color: #7B0F28;">Edit</a>
+            }
+        }
+    </div>
+</div>
+
+<style>
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  padding: 7px 8px;
+}
+
+.tabcontent {
+  background-color: #ffffff;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+  margin-bottom: 15px;
+  height: 200px;
+  overflow: auto;
+}
+</style>

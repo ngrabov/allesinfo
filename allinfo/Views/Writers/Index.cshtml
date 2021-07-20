@@ -1,0 +1,106 @@
+@model PaginatedList<allinfo.Models.Writer>
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = "Index";
+    var currentUser = await userManager.GetUserAsync(User);
+    bool isAdmin;
+    if(signInManager.IsSignedIn(User) && currentUser!= null && await userManager.IsInRoleAsync(currentUser, "Administrator"))
+    {
+        isAdmin = true;
+    }
+    else
+    {
+        isAdmin = false;
+    }
+
+    <style media="screen and (max-width:600px)">
+        .ex{
+            display: none;
+        }
+    </style>
+}
+<div style="padding: 0 15px 0 15px;">
+    <h2 style="color: #7B0F28;">Writers</h2>
+
+    @if(isAdmin)
+    {
+        <p>
+            <a asp-action="Create" style="color: #7B0F28;">Create new</a>
+        </p>
+    }
+    <form asp-action="Index" method="GET">
+        <div class="form-actions no-color">
+            <p>
+                Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+                <input type="submit" value="Search" class="btn" style="background-color: #7B0F28; color: white;" /> 
+                <a asp-action="Index" class="btn" style="background-color: #7B0F28; color: white;">Back to full list</a>
+            </p>
+        </div>
+    </form>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: #7B0F28;">Full Name</a>
+                </th>
+                <th class="ex">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: #7B0F28;">Date of birth</a>
+                </th>
+                <th class="ex">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["NumbSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: #7B0F28;">Number of articles</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                @if(!await userManager.IsInRoleAsync(item, "Administrator"))
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" style="color: #7B0F28;">@Html.DisplayFor(modelItem => item.FullName)</a>
+                        </td>
+                        <td class="ex">
+                            @Html.DisplayFor(modelItem => item.DOB)
+                        </td>
+                        <td class="ex">
+                            @Html.DisplayFor(modelItem => item.ArticleCount)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" style="color: #7B0F28;">Details</a> 
+                            @if(isAdmin == true)
+                            {   
+                                @:|
+                                <a asp-action="Edit" asp-route-id="@item.Id" style="color: #7B0F28;">Edit</a> @:|
+                                <a asp-action="Delete" asp-route-id="@item.Id" style="color: #7B0F28;">Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+
+    <a asp-action="Index" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-pageNumber="@(Model.PageIndex - 1)"
+        asp-route-currentFilter="@ViewData["CurrentFilter"]" class="btn @prevDisabled" style="background-color: #7B0F28; color: white;">
+        Previous
+    </a>
+
+    <a asp-action="Index" asp-route-sortOrder="@ViewData["CurrentSort"]"
+    asp-route-pageNumber="@(Model.PageIndex + 1)"
+    asp-route-currentFilter="@ViewData["CurrentFilter"]"
+    class="btn btn-primary @nextDisabled" style="background-color: #7B0F28; color: white;">
+        Next
+    </a>
+</div>

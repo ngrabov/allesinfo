@@ -1,0 +1,58 @@
+@model allinfo.Models.Team
+@using allinfo.Models
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h1>Edit team</h1>
+
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="HeadCoach" class="control-label"></label>
+                    <input asp-for="HeadCoach" class="form-control" />
+                    <span asp-validation-for="HeadCoach" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="AvatarURL" class="control-label">Select image:</label>
+                    <input type="file" name="file" aria-label="Select image:" accept="image/*" />
+                    <span asp-validation-for="AvatarURL" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Arena" class="control-label"></label>
+                    <input asp-for="Arena" class="form-control" />
+                    <span asp-validation-for="Arena" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="division"></label>
+                    @{var slist = new SelectList(System.Enum.GetValues(typeof(Division)));}
+                    <select asp-for="division" class="form-control" asp-items="@slist">
+                        <option value="">--Select division--</option>
+                    </select>
+                    <span asp-validation-for="division" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+</div>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>

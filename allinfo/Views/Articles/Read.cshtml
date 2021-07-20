@@ -1,0 +1,228 @@
+@model allinfo.Models.Article
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = Model.Headline;
+    var currentUser = await userManager.GetUserAsync(User);
+    bool isAdmin;
+    if(signInManager.IsSignedIn(User) && currentUser!= null && await userManager.IsInRoleAsync(currentUser, "Administrator"))
+    {
+        isAdmin = true;
+    }
+    else
+    {
+        isAdmin = false;
+    }
+    string[] tagArray = new string[]{};
+    if(Model.Tags != null)
+    {
+        tagArray = Model.Tags.Split(" ");
+    }
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <div style="width: 100%;">
+        <h4 style="color: #7B0F28;">@Html.DisplayFor(model => model.Headline)</h4>
+        <hr />
+        <div class="row">
+            <div style="width: 100%;">
+                <dd class="col-sm-12">
+                    <img id="myImgl" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_600,w_1000/@Model.HeadImageURL" class="img" style="width: 100%; height: 400px; object-fit: cover; object-position: 50% 20%;" alt="Error displaying the image." />
+                    <div id="myModall" class="modall">
+                        <span class="closel">&times;</span>
+                        <img class="modal-contentl" id="img01">
+                        <div id="caption"></div>
+                    </div>
+                </dd>
+                <dt class="col-sm-2" id="wn" style="color: #7B0F28;">
+                    @Html.DisplayNameFor(model => model.WriterName)
+                </dt>
+                <dd class="col-sm-10" id="writer">
+                    <a asp-controller="Writers" asp-action="Details" asp-route-id="@Model.Writer.Id" style="color: #7B0F28;">@Html.DisplayFor(model => model.WriterName)</a>
+                    @if((Model.Writer.TwitterHandle != null) && (Model.Writer.TwitterHandle != " "))
+                    {
+                        <a href="@Model.Writer.TwitterHandle" target="_blank"><i class="fa fa-twitter"></i></a>
+                    }
+                </dd>
+                <dt class="col-sm-3" id="ttrn" style="color: #7B0F28;">
+                    @Html.DisplayNameFor(model => model.TimeToRead)
+                </dt>
+                <dd class="col-sm-9" id="ttr">
+                    ~ @Html.DisplayFor(model => model.TimeToRead) min
+                </dd>
+                <dt class="col-sm-2" id="twn" style="color: #7B0F28;">
+                    @Html.DisplayNameFor(model => model.TimeWritten)
+                </dt>
+                <dd class="col-sm-10" id="tw">
+                    @Html.DisplayFor(model => model.TimeWritten) 
+                </dd>
+                <dd class="col-sm-12" id="txt" style="white-space: pre-line;">
+                    @Html.Raw(Model.Text)
+                </dd>
+                <dd class="col-sm-2" id="tags" style="color: #7B0F28; font-weight: bold">
+                    @Html.DisplayNameFor(model => model.Tags) 
+                </dd>
+                <dd class="col-sm-10" id="tagitems" style="color: #7B0F28; font-style: italic">
+                    @foreach (var item in tagArray)
+                    {
+                        <a asp-action="Index" asp-route-tag="@item" style="color: #7B0F28;">@item</a> @: 
+                    }
+                </dd>
+
+                <br>
+                <br>
+                <dd class="col-sm-12" id="txt">
+                    <partial name="_CommentPartial" />
+                </dd>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        
+    </div>
+
+    <div style="padding-bottom: 20px;">
+        <hr />
+        @if(signInManager.IsSignedIn(User))
+        {
+            @if(isAdmin || Model.WriterId == currentUser.Id)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.ArticleID" style="color: #7B0F28;">Edit</a> @:|
+                <a asp-action="Delete" asp-route-id="@Model.ArticleID" style="color: #7B0F28;">Delete</a> @:|
+            }
+        }
+        <a asp-action="Index" style="color: #7B0F28;">Back to List</a>
+    </div>
+</div>
+
+<style media="screen and (min-width:768px)">
+    #txt
+    {
+        max-width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #tags, #tagitems, #wn, #writer, #ttr, #ttrn, #tw, #twn
+    {
+        max-width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+<style>
+    #myImgl {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    }
+
+    #myImgl:hover {opacity: 0.7;}
+
+    .modall {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.9); 
+    }
+
+    .modal-contentl {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    }
+
+    #caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+    }
+
+    .modal-contentl, #caption {  
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+    }
+
+    .closel {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    }
+
+    .closel:hover,
+    .closel:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+    }
+
+</style>
+
+<style media="screen and (max-width: 700px)">
+    .modal-contentl{
+        width: 100%;
+    }
+</style>
+
+<script>
+    var modalz = document.getElementById("myModall");
+
+    var img = document.getElementById("myImgl");
+    var modalImg = document.getElementById("img01");
+    img.onclick = function()
+    {
+        modalz.style.display = "block";
+        modalImg.src = this.src;
+    }
+
+    var spanz = document.getElementsByClassName("closel")[0];
+    spanz.onclick = function() 
+    { 
+        modalz.style.display = "none";
+    }
+</script>
+
+<script>
+        window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+
+            t._e = [];
+            t.ready = function(f) {
+                t._e.push(f);
+            };
+
+            return t;
+        }(document, "script", "twitter-wjs"));
+    </script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">

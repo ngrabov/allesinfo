@@ -1,0 +1,30 @@
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+@using allinfo.Data
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+@inject NewsContext context
+
+@{
+    var query = context.Articles.Where(c => !c.isModerated).Count();
+}
+
+@if (signInManager.IsSignedIn(User))
+{
+    var currentUser = await userManager.GetUserAsync(User);
+
+    var isAdmin = currentUser != null && await userManager.IsInRoleAsync(currentUser, "Administrator");
+
+    if(isAdmin || currentUser.isModerator)
+    {
+        <a class="nex" style="padding-left: 12px;" asp-controller="Articles" asp-action="Moderation"> 
+            Moderation <sup>
+            @if(query != 0)
+            {
+                <button style="border: none; border-radius: 90%; padding: 8px;">@query</button>
+            }
+            </sup>
+        </a>
+    }
+}

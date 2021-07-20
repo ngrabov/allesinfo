@@ -1,0 +1,18 @@
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@if (signInManager.IsSignedIn(User))
+{
+    var currentUser = await userManager.GetUserAsync(User);
+
+    var isManager = currentUser != null && (await userManager.IsInRoleAsync(currentUser, "Administrator") || (await userManager.IsInRoleAsync(currentUser, "Manager")));
+
+    if(isManager)
+    {
+        <a class="nex" style="padding-left: 12px; padding-right: 12px;" asp-area="" asp-controller="Articles" asp-action="Create"> New article</a>
+        <a class="nex" style="padding-left: 12px; padding-right: 12px;" asp-controller="Writers" asp-action="Details" asp-route-id="@currentUser.Id"> @currentUser.FirstName</a>
+    }
+}

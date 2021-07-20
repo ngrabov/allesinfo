@@ -1,0 +1,66 @@
+@model IEnumerable<allinfo.Models.Team>
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Teams";
+
+    <style media="screen and (min-width: 768px) and (max-width: 991px)">
+        #cImg{
+            display: none;
+        }
+    </style>
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h2>Teams</h2>
+    <div class="row">
+        @for(int i = 0; i < 6;i++)
+        {
+            @if(i == 0)
+            {
+                <div style="display: flex; justify-content: center; width: 100%; padding: 30px 0px;">
+                    <h4>East</h4>
+                </div>
+            }
+            @if(i == 3)
+            {
+                <div style="display: flex; justify-content: center; width: 100%; padding: 30px 0px;">
+                    <h4>West</h4>
+                </div>
+            }
+            <div class="col-md-4">
+                @foreach (var item in System.Enum.GetValues(typeof(Division)))
+                {
+                    @if((int)item == i)
+                    {
+                        <div style="display:flex; justify-content: center; width: 100%;"><b>@item</b></div>
+                    }
+                }
+                <table class="table table-hover" style="font-size: small;">
+                    <thead>
+                        <tr>
+                            <th id="cImg"></th>
+                            <th></th>
+                            <th style="text-align: right;">Payroll</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            @if((int)item.division == i)
+                            {
+                                <tr>
+                                    <td id="cImg">
+                                        <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_50,w_50/@item.AvatarURL" style="width: 40px; height: 40px;" alt="Error displaying the image." />
+                                    </td> 
+                                    <td><a asp-controller="Teams" asp-action="Details" asp-route-id="@item.ID"> @Html.DisplayFor(modelItem => item.Name)</a></td>
+                                    <td style="text-align: right;">@item.payroll.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

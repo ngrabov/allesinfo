@@ -1,0 +1,337 @@
+@model allinfo.Models.Team
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+@using System
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = Model.Name;
+    int i;
+    int[] arr = new int[6];
+    double[] sum = new double[5];
+    var avgage = ViewData["Avgs"].ToString();
+    if(System.DateTime.Now.Month < 7)
+    {
+        for( i = 0; i < 6; i++)
+        {
+            arr[i] = System.DateTime.Now.Year - 1 + i;
+        }
+    }
+    else
+    {
+        for( i = 0; i < 6; i++)
+        {
+            arr[i] = System.DateTime.Now.Year + i;
+        }
+    }
+
+    <style media="screen and (min-width:600px)">
+        .wth{
+            width: 60%;
+            margin: auto;
+        }
+    </style>
+    <style media="screen and (max-width: 768px)">
+        #myDiv{
+            width: 100%;
+            max-width: 300px;
+            top: 40%;
+            height: auto;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        h1 {
+            font-size: x-large;
+        }
+        #myText{
+            width: 90%;
+            margin: auto;
+            text-align: center;
+        }
+        #myCol{
+            bottom: 90px;
+        }
+        #myRow{
+            margin-right: 0px;
+        }
+        p{
+            font-size: medium;
+        }
+        #mb{
+            margin-bottom: -7px;
+        }
+    </style>
+    <style media="screen and (min-width: 768px)">
+        #myDiv{
+            top: 50%;
+            left: 0%;
+            transform: translate(0%, -50%);
+        }
+        #mb{
+            margin-bottom: -8px;
+        }
+    </style>
+    <style media="screen and (max-width: 575px)">
+        .col-sm-8{
+            padding: 0px;
+        }
+        .contain{
+            padding: 10px;
+        }
+        .row{
+            width: 100%;
+            margin: auto;
+        }
+        .wth{
+            width: 95%;
+        }
+    </style>
+    <style media="screen and (min-width: 576px)">
+        .contain, .col-sm-8{
+            padding: 0 15px 0 25px;
+        }
+        .wth{
+            width: 70%;
+        }
+    </style>
+    <style>
+        .crd{
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+        .crd:hover{
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+    </style>
+    var currentUser = await userManager.GetUserAsync(User);
+}
+
+<div style="width: 100%; height: 300px; background-image: linear-gradient(to right, @Model.teamColor1, @Model.teamColor2);">
+    <div class="row" id="myRow" style="position: relative; top: 150px; left: 0;">
+        <div class="col-md-4" id="myDiv" style="position: relative;">
+            <img id="myTeam" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_500,w_500/@Model.AvatarURL" 
+                class="img" style="width: 70%; margin: auto; height: auto; display: block;" alt="Error displaying the image." />
+        </div>
+        <div class="col-md-8" id="myCol" style="display: flex; transform: translate(0%, -10%);">
+            <h1 id="myText" style="color: white;">
+                @Model.Name
+            </h1>
+        </div>
+    </div>
+</div>
+
+<div class="contain">   
+    <div class="row" style="padding: 20px 0px 0px 0px; display: flex; flex-direction: row-reverse;">
+        <div class="col-sm-8">
+            @{
+                var articles = ViewData["Artcls"] as List<Article>;
+            }
+            @foreach (var item in articles.Take(1))
+            {
+                <div style="width: 100%; height: 480px; border: solid 1px lightgrey; background-color: white;">
+                    <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID">
+                        <img src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_360,w_600/@item.HeadImageURL" 
+                        class="img" style="width: 100%; height: 360px; object-fit: cover; object-position: 50% 10%;" alt="Error displaying the image.">
+                    </a>
+                    <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID" style="color: #7a3b69; font-size: x-large; padding: 10px; 
+                    overflow: hidden;"><p style="padding: 10px;" onmouseover="this.style.color='green'" onmouseout="this.style.color='#7a3b69'"><b>@item.Headline</b></p></a>
+                </div>
+            }
+            @foreach (var item in articles.Skip(1))
+            {
+                <div style="width: 100%; height: 120px; margin-top: 25px; border: solid 1px lightrey; background-color: white; display: flex;">
+                    <a asp-action="Read" asp-controller="Articles" asp-route-id="@item.ArticleID" style="width: 30%; height: 120px;">
+                        <img src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_120,w_200/@item.HeadImageURL" class="img" 
+                        style="object-fit:cover; object-position: 50% 10%; width: 100%; height: 118px;" alt="Error displaying the image." />
+                    </a>
+                    <a asp-controller="Articles" asp-action="Read" asp-route-id="@item.ArticleID"
+                    style="width: 70%; height: 120px;">
+                        <p style="padding: 10px; overflow: hidden; font-size: medium; color: #7a3b69;"  onmouseover="this.style.color='green'" onmouseout="this.style.color='#7a3b69'">
+                            <b>@item.Headline</b>
+                        </p>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="col-sm-4">
+            <div class="crd" style="background-color: white; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); margin-top: 15px;">
+                <table class="table table-hover" style="font-size: small;">
+                    <tbody>
+                        <tr>
+                            <td>Division</td>
+                            <td>@Model.division</td>
+                        </tr>
+                        <tr>
+                            <td>Coach</td>
+                            <td>@Model.HeadCoach</td>
+                        </tr>
+                        <tr>
+                            <td>Arena</td>
+                            <td>@Model.Arena</td>
+                        </tr>
+                        <tr>
+                            <td>Titles</td>
+                            <td>@Model.championships</td>
+                        </tr>
+                        <tr>
+                            <td>Average age</td>
+                            <td>@Math.Round(Convert.ToDecimal(avgage), 1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="crd" style="width: 100%; margin-top: 40px; height: 300px; background-color: white; padding: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);">
+                <p style="width: 100%; text-align: center;"><b>NBA Team salaries</b></p>
+                <div style="display: flex; flex-direction: row; height: 220px;">
+                    <div style="height: 200px; width: 10%; font-size: x-small; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="font-size: x-small; margin-top: -9px;">$200M</div>
+                        <div style="font-size: x-small;">$100M</div>
+                        <div style="font-size: x-small; margin-bottom: -9px;">$0M</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; width: 90%; float: right;">
+                        <div id="mb" style="position: relative; display: flex; align-items: flex-end; width: 90%; height: 200px;">
+                            @{
+                                int pos = 0; int poss = 0; int ht; int nw; string col; string back; int cnt = 1; double px = 0.0; string pix = "";
+                                double rnd = 0.0;
+                            }
+                            @foreach (var item in ViewData["Payrolls"] as List<Team>)
+                            {
+                                ht = (int)(item.payroll / 1000000);
+                                rnd = Math.Round(item.payroll / 1000000.0, 2);
+                                nw = pos * 9;
+                                col = item.teamColor1;
+                                poss = pos + 30; 
+                                @if(item.Name == Model.Name)
+                                {
+                                    back = item.teamColor1;
+                                    cnt = pos + 1;
+                                    px = -3.33 + (cnt - 15) * 6.66;
+                                    pix = px.ToString().Replace(",",".");
+                                }
+                                else
+                                {
+                                    back = "lavender";
+                                }
+                                <div onmouseover="this.style.background='@col'; document.getElementById('@pos').style.visibility='visible'; document.getElementById('@poss').style.visibility='visible'"
+                                    onmouseout="this.style.background='@back'; document.getElementById('@pos').style.visibility='hidden'; document.getElementById('@poss').style.visibility='hidden'" 
+                                    style="width: 2.8%; height: @(ht+"px"); left: @(nw+"px"); background-color: @back; margin-right: 0.5%;">
+                                    
+                                    @if(item.Name == Model.Name)
+                                    {
+                                        <img class="img" style="width: 24px; height: 24px; position: relative; top: -40px; left: -7px;"
+                                        src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_30,w_30/@Model.AvatarURL" alt="Error displaying the image." />
+                                        <div style="font-size: x-small; position: relative; top: -40px; left: -9px;"><b>@rnd</b></div>
+                                    }
+                                    else
+                                    {
+                                        <img id="@poss" class="img" style="visibility: hidden; width: 24px; height: 24px; position: relative; top: -40px; left: -7px;"
+                                        src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_30,w_30/@item.AvatarURL" alt="Error displaying the image." />
+                                        <div id="@pos" style="visibility: hidden; font-size: x-small; position: relative; top: -40px; left: -9px;">@rnd</div>
+                                    }
+                                </div>
+                                pos++;
+                            }
+                        </div>
+                        <hr style="width: 90%; margin-left: 10%;">
+                        <div style="width: 90%; display: flex; flex-direction: row; font-size: x-small; height: 10px; justify-content: space-between;">
+                            <p style="font-size: x-small; text-align: left;">1</p>
+                            @if(cnt!= 1 && cnt!= 30)
+                            {
+                                <p style="font-size: x-small; text-align: center; margin-left: @(pix+"%");">@cnt</p>
+                            }
+                            <p style="font-size: x-small; text-align: right;">30</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wth" style="overflow: auto; margin-top: 50px; margin-left: auto; margin-right: auto;">
+        <h4 style="text-align: center;">@Model.Name Team Salary</h4>
+        <table class="table table-hover" style="width: 99%; font-size: small; overflow: hidden;">
+            <thead style="overflow: hidden; margin-right: 10px;">
+                <th>Name</th>
+                @for ( i = 0; i < 5; i++)
+                {
+                    <th>@arr[i]-@arr[i+1]</th>
+                }
+            </thead>
+            <tbody style="overflow:hidden; margin-right: 10px; padding-right: 10px;">
+                @{
+                    var t = ViewData["Salary"] as List<Player>;
+                }
+                @foreach (var item in t)
+                {
+                    <tr style="overflow: hidden;">
+                        <td><a asp-controller="Players" asp-action="Details" asp-route-id="@item.ID" style="color: #7a3b69;">@item.FullName</a></td>
+                        <td id="@item.ID 1">@item.salary1.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        <td id="@item.ID 2">@item.salary2.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        <td id="@item.ID 3">@item.salary3.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        <td id="@item.ID 4">@item.salary4.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        <td id="@item.ID 5">@item.salary5.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        @{sum[0] += item.salary1; sum[1]+= item.salary2; sum[2] += item.salary3; sum[3] += item.salary4; sum[4] += item.salary5;}
+                    </tr>
+
+                    @if((int)item.contractOption == 0)
+                    {
+                        <script type="text/javascript">
+                            document.getElementById(@item.ID + " " + @item.contractLength).style.color = 'blue';
+                        </script>
+                    }
+                    @if((int)item.contractOption == 1)
+                    {
+                        <script type="text/javascript">
+                            document.getElementById(@item.ID + " " + @item.contractLength).style.color = 'red';
+                        </script>
+                    }
+                    @if((int)item.contractOption == 2)
+                    {
+                        <script type="text/javascript">
+                            document.getElementById(@item.ID + " " + @item.contractLength).style.color = 'red'; 
+                            document.getElementById(@item.ID + " " + (@item.contractLength - 1)).style.color = 'red'; 
+                        </script>
+                    }
+                }
+                <tr>
+                    <td><b>Totals</b></td>
+                    @foreach (var s in sum)
+                    {
+                        <td><b>@s.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</b></td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+        <div style="display: flex; margin: auto; width: 95%;">
+            <div class="square" style="margin-top: 7px;"></div> 
+            <p style="color: blue; font-size: small; padding: 0px 14px 0px 4px;"> Player Option</p> 
+            <div class="square" style="background-color: red; margin-top: 7px;"></div> 
+            <p style="color: red; font-size: small; padding: 0px 4px;"> Team Option</p>
+        </div>
+    </div>
+</div>
+
+<div style="padding: 0px 0px 20px 15px;">
+    <hr />
+    @if(signInManager.IsSignedIn(User))
+    {
+        @if(currentUser.isAdmin || currentUser.isModerator)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.ID" style="color: #7B0F28;">Edit</a>
+        }
+    }
+</div>
+
+<style>
+    .square{
+        height: 5px;
+        width: 5px;
+        background-color: blue;
+    }
+</style>

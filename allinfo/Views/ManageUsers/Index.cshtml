@@ -1,0 +1,95 @@
+@model ManageUsers
+
+@{
+    ViewData["Title"] = "Manage users";
+
+    <style media="screen and (max-width:600px)">
+        .ex{
+            display: none;
+        }
+    </style>
+}
+<div style="padding: 0 15px 0 15px;">
+    <h2>@ViewData["Title"]</h2>
+    <br><br>
+    <h3>Administrators</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td class="ex">Email</td>
+                <td>Full Name</td>
+                <td class="ex">Date of Birth</td>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model.Administrators)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td class="ex">@item.Email</td>
+                <td>
+                    <a asp-controller="Writers" asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.FullName)</a>
+                </td>
+                <td class="ex">@Html.DisplayFor(modelItem => item.DOB)</td>
+            </tr>
+        }
+    </table>
+
+    <h3>Everyone</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td class="ex">Email</td>
+                <td>Full Name</td>
+                <td class="ex">Date of Birth</td>
+                <td class="ex">isManager</td>
+                <td class="ex">isAdmin</td>
+                <td class="ex">isModerator</td>
+                <td><input type="submit" value="Delete" class="btn btn-primary" style="background-color: #7B0F28; color: white; padding: 5px;"></td>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model.Everyone)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td class="ex">@item.Email</td>
+                <td>
+                    <a asp-controller="Writers" asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.FullName)</a>
+                </td>
+                <td class="ex">@Html.DisplayFor(modelItem => item.DOB)</td>
+                @if(item.isManager)
+                {
+                    <td class="ex"><b>Yes</b></td>
+                }
+                else
+                {
+                    <td class="ex">No</td>
+                }
+                @if(item.isAdmin)
+                {
+                    <td class="ex"><b>Yes</b></td>
+                }
+                else
+                {
+                    <td class="ex">No</td>
+                }
+                @if(item.isModerator)
+                {
+                    <td class="ex"><b>Yes</b></td>
+                }
+                else
+                {
+                    <td class="ex">No</td>
+                }
+                <td>
+                    <a asp-controller="Writers" asp-action="Delete" asp-route-id="@item.Id" style="color: #7B0F28; padding-left: 5px;">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>

@@ -1,0 +1,295 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="Description" content="A simple news-related web page with login and comment system."/>
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <script src="~/js/fa.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+        .text-danger{
+            color: red;
+        }
+        .twitter-tweet, .twitter-tweet-rendered {
+            max-width: 100%;
+        }
+        #twitter-widget-0 {
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .container {
+            padding: 0 0px 50px 0px;
+        } 
+        .navbar-dark .navbar-toggler-icon 
+        {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(255, 255, 255)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e")
+        }
+        .navbar-dark .navbar-toggler 
+        {
+            color: rgba(255,255,255);
+            border-color: rgba(255,255,255)
+        }
+        .navbar-nav .nav-link{
+            padding-left: 12px;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        a.navbar-brand{
+            padding-left: 10px;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            padding: 7px 8px;
+        }
+
+        .tabcontent {
+            background-color: #ffffff;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+            margin-bottom: 15px;
+            height: 200px;
+            overflow: auto;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            text-decoration: none;
+            width: 290px;
+            left: 138px;
+            z-index: 1;
+            transition: .6s;
+        }
+
+        .dropdown-contentzz {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            text-decoration: none;
+            width: 190px;
+            left: 360px;
+            z-index: 1;
+            transition: .6s;
+        }
+
+        .columnz {
+            float: left;
+            width: 100%;
+            background-color: #fff;
+            text-decoration: none;
+        }
+
+        .nex {
+            float: none;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .nex:hover {
+            background-color: #bbb;
+            color: white;
+            text-decoration: none;
+        }
+
+        .navbar-toggler{
+            margin-right: 15px;
+        }
+
+        .rowz:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .show{
+            display: block;
+        }
+    </style>
+    <style media="screen and (max-width:575px)">
+        header{
+            margin-bottom: 0px;
+        }
+        .tex
+        {
+            display: none;
+        }
+        .navbar{
+            position: relative;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .navbar a{
+            float:none;
+            display: block;
+            text-align: left;
+        }
+        .dropdownz{
+            float: none;
+        }
+        .dropdown-content, .dropdown-contentzz{
+            position: relative;
+            float: left;
+            left: 0px;
+            width: 100%;
+        }
+        .nex{
+            color: black;
+        }
+    </style>
+    <style media="screen and (min-width:576px)">
+        body header a:hover, body header button:hover{
+            background-color: #9c4c87;
+        }
+        header
+        {
+            height: 56px;
+            margin-bottom: 70px;
+        }
+        .navbar
+        {
+            padding: 0;
+            height: 100%;
+        }
+        .navbar a, .navbar-collapse, ul.navbar-nav {
+            height: 100%;
+        }
+        .nav-link{
+            padding: .9rem .1rem;
+        }
+        .navbar-brand{
+            padding: .7rem .9rem;
+        } 
+        .dropdownz:hover .dropdown-content {
+            display: block;
+            background-color: #9c4c87;
+            text-decoration: none;
+        }
+        .dropdownz:hover .dropdown-contentzz {
+            display: block;
+            background-color: #9c4c87;
+            text-decoration: none;
+        }
+    </style>
+    <style media="screen and (max-width:1200px)">
+        .navbar, .navbar button, .navbar-brand
+        {
+            font-size: small;
+        }
+
+    </style>
+    <style media="screen and (max-width:768px) and (min-width:576px)">
+        .dropdown-content{
+            left: 108px;
+        }
+        .dropdown-contentzz{
+            left: 305px;
+        }
+    </style>
+    <style media="screen and (min-width:768px) and (max-width:1200px)">
+        .dropdown-content{
+            left: 109px;
+        }
+        .dropdown-contentzz{
+            left: 306px;
+        }
+    </style>
+</head>
+<body style="background-color: #9a879d;">
+    <header style="position: sticky; top: 0; z-index: 1;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark" style="background-color: #7a3b69; position: sticky; top: 0;">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color: white; font-weight: bold; margin-right: 0px;"><img src="~/nba.ico" style="height: 32px; width:32px;" alt="myimg"></img> ALLINfo </a> 
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <partial name="_LoginPartial" />
+                <ul class="navbar-nav flex-grow-1">
+                    <div class="dropdownz">
+                        <a class="nav-link" onclick="dropMe(1)" style="color: #ffffff; padding-left: 13px; padding-right: 13px; cursor: pointer;"> Articles</a>
+                        <div class="dropdown-content" id="colz">
+                            <div class="rowz">
+                                <a class="nex" style="padding-left: 12px;" asp-area="" asp-controller="Articles" asp-action="Index" asp-route-field="Rumors"> Rumors</a>
+                                <a class="nex" style="padding-left: 12px;" asp-area="" asp-controller="Articles" asp-action="Index" asp-route-field="Draft"> Draft</a>
+                                <a class="nex" style="padding-left: 12px;" asp-area="" asp-controller="Articles" asp-action="Index" asp-route-field="Transactions"> Transactions</a>
+                                @await Html.PartialAsync("_ManagerActionsPartial")
+                                @await Html.PartialAsync("_ModActionsPartial")  
+                                @await Html.PartialAsync("_AdminActionsPartial")  
+                            </div>
+                        </div>
+                    </div>
+                        <a class="nav-link" style="color: #ffffff; padding-left: 13px; padding-right: 13px;" asp-area="" asp-controller="Players" asp-action="Index"> Players</a>
+                        <a class="nav-link" style="color: #ffffff; padding-left: 13px; padding-right: 13px;" asp-area="" asp-controller="Teams" asp-action="Index"> Teams</a>
+                        
+                    <div class="dropdownz">
+                        <a class="nav-link" style="color: #ffffff; padding-left: 13px; padding-right: 13px; cursor: pointer;" onclick="dropMe(2)"> Features</a>
+                        <div class="dropdown-contentzz" id="colzz">
+                            <div class="rowz">
+                                <a class="nex" style="padding-left: 13px; padding-right: 13px;" asp-area="" asp-controller="Prospects" asp-action="MockDraft"> Mock Draft</a>
+                                <a class="nex" style="padding-left: 13px; padding-right: 13px;" asp-area="" asp-controller="Players" asp-action="UpcomingFA"> 2021 Free Agents</a>
+                            </div>
+                        </div>
+                    </div> 
+                        <a class="nav-link" style="color: #ffffff; padding-left: 13px; padding-right: 13px;" asp-area="" asp-controller="Writers" asp-action="Index"> Writers</a>
+                    
+                </ul>
+            </div>
+        </nav>
+        <partial name="_GamesPartial" view-data="ViewData" />
+    </header>
+    
+    <div class="container" style="background-color: #eee;">
+        <partial name="_CookieConsentPartial" />
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div> 
+
+    <footer style="position: absolute; left: 0; bottom: 0; width: 100%; padding: 20px 0 0 0;">
+        <div class="container-fluid" style="background-color: #46223d; color: white; padding: 10px 20px 15px 20px; font-family: Verdana, Helvetica, sans-serif;">
+            <div style="display: flex; justify-content: center;">
+                <a href="https://facebook.com/nkl.grbvc" rel="noreferrer" target="_blank" style="padding: 15px 10px;" title="FB"><i class="fab fa-facebook-square" style="color: white; font-size: 24px;" ></i> </a>
+                <a href="https://twitter.com/grabovac9" rel="noreferrer" target="_blank" style="padding: 15px 10px;" title="twitter"><i class="fab fa-twitter" style="color: white; font-size: 24px;" ></i>  </a>
+                <a href="https://instagram.com/nikola.grabovacds" rel="noreferrer" target="_blank" style="padding: 15px 10px;" title="IG"><i class="fab fa-instagram" style="color: white; font-size: 24px;" ></i>   </a>
+            </div>
+            <div style="display: flex; justify-content: center;">
+                &copy; 2021 ALLINfo
+            </div>
+            <div style="display: flex; justify-content: center; font-size: 12px;">
+                <a asp-controller="Home" asp-action="Privacy" style="color: white;">Privacy</a>
+            </div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function dropMe(i){
+            if((window.innerWidth) < 576)
+            {
+                if(i==1) document.getElementById("colz").classList.toggle("show");
+                if(i==2) document.getElementById("colzz").classList.toggle("show");
+            }
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

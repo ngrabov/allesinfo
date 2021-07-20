@@ -1,0 +1,50 @@
+@model IEnumerable<allinfo.Models.Article>
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = "Moderation";
+    var currentUser = await userManager.GetUserAsync(User);
+    <style media="screen and (max-width:600px)">
+        .ex{
+            display: none;
+        }
+    </style>
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h1>Moderate articles</h1>
+
+    <table class="table table-hover">
+        <tbody>
+            @foreach (var item in Model.OrderByDescending(s => s.TimeWritten))
+            {
+                <tr>
+                    <td style="width: 20%;">
+                        <a asp-action="Read" asp-route-id="@item.ArticleID" style="color: #7B0F28;"><b>@Html.DisplayFor(modelItem => item.Headline)</b></a>
+                    </td>
+                    <td style="width: 15%;" class="ex">
+                        <a asp-controller="Writers" asp-action="Details" asp-route-id="@item.WriterId" style="color: #7B0F28;">@Html.DisplayFor(modelItem => item.WriterName)</a>
+                    </td>
+                    <td style="width: 12%;" class="ex">
+                        @Html.DisplayFor(modelItem => item.Field)
+                    </td>
+                    <td style="width: 32%;" class="ex">
+                        @Html.DisplayFor(modelItem => item.SubText)
+                    </td>
+                    <td style="width: 21%;">
+                        <a asp-action="Edit" asp-route-id="@item.ArticleID">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ArticleID">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if(Model.Count() == 0)
+            {
+                <p>There are no articles to moderate! Have a very good day! :) </p>
+            }
+        </tbody>
+    </table>
+</div>

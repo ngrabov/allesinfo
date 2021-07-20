@@ -1,0 +1,202 @@
+@model TeamsViewModel
+@using allinfo.ViewModels
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+
+@{
+    ViewData["Title"] = "All-NBA's 2021 NBA Mock Draft";
+    bool isManager = false;
+
+    if(signInManager.IsSignedIn(User))
+    {
+        var currentUser = await userManager.GetUserAsync(User);
+
+        isManager = currentUser != null && (await userManager.IsInRoleAsync(currentUser, "Administrator") || (await userManager.IsInRoleAsync(currentUser, "Manager")));
+    }
+
+    <style>
+        .accordion {
+            background-color: grey;
+            color: white;
+            cursor: pointer;
+            padding: 13px;
+            width: 100%;
+            text-align: left;
+            outline: none;
+            transition: 0.9s;
+        }
+        .active, .accordion:hover {
+            background-color: #7a3b69;
+        }
+        .imgf{
+            filter: grayscale(1);
+            transition: 0.3s;
+        }
+        .panel:hover .imgf{
+            filter: grayscale(0);
+        }
+        .panel {
+            margin-left: 8px;
+            margin-right: 8px;
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            transition: max-height 0.9s ease-out;
+            overflow: hidden;
+        }
+        .trigger:hover {
+            cursor: pointer;
+        }
+        .trigger{
+            background-color: #7a3b69; 
+            color: white;
+        }
+        .act{
+            color: black;
+            background-color: white;
+        }
+        .C, .PF, .SF, .SG, .PG{
+            max-height: 1500px;
+            transition: max-height 0.9s ease-in-out;
+        }
+        .vis {
+            max-height: 0;
+            overflow: hidden;
+        }
+    </style>
+    <style media="screen and (max-width: 576px)">
+        .hide{
+            display: none;
+        }
+        .three{
+            width: 15;
+        }
+    </style>
+    <style media="screen and (min-width: 576px)">
+        .three{
+            width: 10%;
+        }
+    </style>
+    <style media="screen and (max-width: 992px)">
+        .headline{
+            left: 30px;
+            bottom: 120px;
+        }
+    </style>
+    <style media="screen and (min-width: 992px)">
+        .headline{
+            left: 100px;
+            top: 100px;
+        }
+    </style>
+}
+
+<div style="width: 100%; position: relative; padding-bottom: 30px; background-color: white;">
+    <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_800,w_1200/ecade_headline_iuvrgo.jpg" 
+    style="width: 100%; height: auto;" alt="Error displaying the image." />
+    <div class="headline" style="font-family: 'Verdana', 'Helvetica', 'sans-serif'; max-width: 260px; color: black; padding: 0px 20px; position: absolute; background-color: aquamarine;">
+        <h4 style="margin-bottom: 20px; font-weight: 900; font-size: 1rem; margin-top: 20px; line-height: 1.2;">2021 NBA MOCK DRAFT</h4>
+        <p class="hide" style="font-size: small;">One of the better draft classes in recent times sees an Oklahoma State guard as a heavy favorite to go No. 1.</p>
+    </div>
+    <div style="width: 70%; min-width: 250px; margin: auto; display: flex; padding-top: 50px; justify-content: center;">
+        @foreach (var item in System.Enum.GetValues(typeof(Position)))
+        {
+            <div class="trigger" style="height: 25px; width: 65px; border: solid 1px lightgrey; margin-right: 7px; text-align: center; user-select: none;">@item</div>
+        }
+    </div> 
+</div>
+
+<div class="container" style="padding: 30px 20px 20px 20px; border-radius: 5px; background-color: white;">
+    @foreach (var item in Model.Prospects)
+    {
+        <div class="@item.playingPosition">
+            <div class="accordion" style="display: flex; border-radius: 5px; padding-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <div style="margin-right: 25px; font-size: xx-large; width: 5%; height: 100%;">@item.rank</div>
+                    <div style="display: flex; flex-direction: column; width: 80%; padding-left: 7px;">
+                        <div style="font-size: large; width: 75%;"><b>@item.Name.ToUpper()</b></div>
+                        <div style="margin-right: 15px;"><b>@item.playingPosition</b> @item.college (@item.group)</div>
+                    </div>
+                    <div class="three">
+                        <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_100,w_100/@item.Team.AvatarURL"
+                        style="width: 50px; height: 50px; object-fit: cover; object-position: 50% 10%;" alt="Error displaying the image." />
+                    </div>
+                    @if(isManager)
+                    {
+                        <a asp-controller="Prospects" asp-action="Edit" asp-route-id="@item.ID" style="margin-left: 10px; padding-top: 12px; color: white;">Edit</a>
+                    }
+                </div>
+            </div>
+            <div class="panel" style="display: flex; flex-direction: row; margin-bottom: 10px; background-color: #f0f0f0;">
+                <div class="row" style="margin-left: 10px; padding-right: 20px;">
+                    <div class="col-md-3" style="margin-top: 20px; z-index: 0; padding-left: 0px; padding-right: 20px;">
+                        <img class="img imgf" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_600,w_450/@item.aviUrl" 
+                        style="width: 100%; height: 250px; object-fit: cover; object-position: 50% 10%; background-image: url('https://res.cloudinary.com/dsjavparg/image/upload/v1624351533/pattern1_o7lt65.jpg');" alt="Error displaying the image." />
+                        <div style="width: 100%; background-color: beige; height: 150px; border-radius: 10px; display: flex; flex-wrap: wrap; border: solid 1px lightgrey; position:relative; top: -20px; z-index: -1;">
+                            <div style="position: relative; top: 35px; width: 50%; text-align: center; height: 55px; font-size: small;">@item.height cm</div>
+                            <div style="position: relative; top: 35px; width: 50%; text-align: center; height: 55px; font-size: small;">@item.age yrs old</div>
+                            <hr style="width: 90%;" />
+                            <div style="width: 25%; text-align: center; font-size: small;"><b>@item.stat1</b></div>
+                            <div style="width: 25%; text-align: center; font-size: small;"><b>@item.stat3</b></div>
+                            <div style="width: 25%; text-align: center; font-size: small;"><b>@item.stat5</b></div>
+                            <div style="width: 25%; text-align: center; font-size: small;"><b>@item.stat7</b></div>
+                            <div style="width: 25%; text-align: center; position: relative; top: -10px;">@item.stat2</div>
+                            <div style="width: 25%; text-align: center; position: relative; top: -10px;">@item.stat4</div>
+                            <div style="width: 25%; text-align: center; position: relative; top: -10px;">@item.stat6</div>
+                            <div style="width: 25%; text-align: center; position: relative; top: -10px;">@item.stat8</div>
+                        </div>
+                    </div>
+                    <div class="col-md-9" style="padding-bottom: 20px;">
+                        <p style="font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">@Html.Raw(item.report)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if(isManager)
+{
+    <div style="padding-bottom: 20px; background-color: white;">
+        <a style="padding-left: 12px; padding-right: 12px;" asp-area="" asp-controller="Prospects" asp-action="Create"> Add a prospect</a>
+    </div>
+}
+
+<script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+
+        var panel = this.nextElementSibling;
+        if (panel.style.maxHeight) {
+            panel.style.maxHeight = null;
+        } 
+        else {
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+    });
+    }
+
+    var trg = document.getElementsByClassName("trigger");
+    var j, k, l;
+
+    for( j = 0; j < trg.length; j++)
+    {
+        trg[j].addEventListener("click", function() {
+            this.classList.toggle("act");
+
+            var divs = document.getElementsByClassName(this.innerHTML);
+            for(k = 0; k < divs.length; k++)
+            {
+                divs[k].classList.toggle("vis");
+            }
+        });
+    }
+</script>

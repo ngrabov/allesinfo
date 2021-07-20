@@ -1,0 +1,150 @@
+@using allinfo.ViewModels
+@model TeamsViewModel
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+@using System.Globalization
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = "Players";
+
+    var currentUser = await userManager.GetUserAsync(User);
+    bool isAdmin;
+    if(signInManager.IsSignedIn(User) && currentUser!= null && await userManager.IsInRoleAsync(currentUser, "Administrator"))
+    {
+        isAdmin = true;
+    }
+    else
+    {
+        isAdmin = false;
+    }
+
+    <style media="screen and (max-width:600px)">
+        .ex{
+            display: none;
+        }
+    </style>
+
+    <style media="screen and (max-width:992px)">
+        .tex{
+            display: none;
+        }
+    </style>
+
+    <style media="screen and (max-width:768px)">
+        .zex{
+            display: none;
+        }
+    </style>
+
+    <style>
+        td, th{
+            height: 40px;
+        }
+    </style>
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h2 style="color: #7B0F28;">Players</h2>
+
+    @if(isAdmin || (signInManager.IsSignedIn(User) && currentUser.isModerator))
+    {
+        <p>
+            <a asp-action="Create" style="color: #7B0F28;">Create new</a>
+        </p>
+    }
+
+    <form asp-controller="Players" asp-action="Index" method="GET" id="mform" style="display: flex; flex-wrap: wrap;">
+        <div style="width: 220px;">
+            <select id="slist" asp-for="TeamId" asp-items="@ViewBag.teams" style="height: 30px; margin: 8px 18px 10px 0px;">
+                <option value="">--Select Team--</option>
+            </select>
+        </div>
+        <div>
+            @{var sl = new SelectList(System.Enum.GetValues(typeof(Position)));}
+            <select id="sl" asp-items="@sl" asp-for="position" style="width: 178px; height: 30px; margin: 8px 18px 10px 0px;">
+                <option value="">--Select position--</option>
+            </select>
+        </div>
+        <div style="display: flex;">
+            <div>
+                Born between 
+                <select asp-for="minage" id="ma" asp-items="@ViewBag.ages" style="height: 30px; width: 80px; margin: 8px 8px 10px 0px;">
+                    <option value="">-</option>
+                </select>
+            </div>
+            <div>
+                and 
+                <select asp-for="maxage" id="mx" asp-items="@ViewBag.ages" style="height: 30px; width: 80px; margin: 8px 8px 10px 10px;">
+                    <option value="">-</option>
+                </select>
+            </div>
+        </div>
+    </form> 
+
+    <table class="table table-hover" style="font-size: small;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th></th>
+                <th>Player</th>
+                <th>Pos.</th>
+                <th>Team</th>
+                <th class="ex">Height</th>
+                <th class="ex zex">Nationality</th>
+                <th class="ex">DOB</th>
+                <th class="ex tex"><a asp-action="Index" asp-route-sortOrder="@ViewData["PtsGSortParm"]" asp-route-minage="@ViewData["minage"]" asp-route-maxage="@ViewData["maxage"]" asp-route-TeamId="@ViewData["CurrentFilter"]" asp-route-position="@ViewData["Position"]" style="color: #7B0F28;" >PPG</a></th>
+                <th class="ex tex"><a asp-action="Index" asp-route-sortOrder="@ViewData["SlrySortParm"]" asp-route-minage="@ViewData["minage"]" asp-route-maxage="@ViewData["maxage"]" asp-route-TeamId="@ViewData["CurrentFilter"]" asp-route-position="@ViewData["Position"]" style="color: #7B0F28;" >Salary</a></th>
+                <th class="ex tex"><a asp-action="Index" asp-route-sortOrder="@ViewData["2RTGSortParm"]" asp-route-minage="@ViewData["minage"]" asp-route-maxage="@ViewData["maxage"]" asp-route-TeamId="@ViewData["CurrentFilter"]" asp-route-position="@ViewData["Position"]" style="color: #7B0F28;">2K rtg</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Players)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.shirtNumber)</td>
+                    <td><div style="height: 32px; width: 32px; background-color: white; border-radius: 50%; display: inline-block;"><img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_32,w_32/@item.AvatarURL" style="height: 32px; width: 32px; overflow: hidden; border-radius: 50%;" alt="Err" /></div></td>
+                    <td><a asp-action="Details" asp-route-id="@item.ID" style="color: #7B0F28;"><b>@Html.DisplayFor(modelItem => item.FullName)</b></a></td>
+                    <td>@Html.DisplayFor(modelItem => item.playingPosition)</td>
+                    <td><a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamId" style="color: #7B0F28;"><img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_32,w_32/@item.Team.AvatarURL" style="height: 32px; width: 32px;" alt="Error displaying the image." /></a></td>
+                    <td class="ex">@Html.DisplayFor(modelItem => item.height)</td>
+                    <td class="ex zex">@Html.DisplayFor(modelItem => item.nationality)</td>
+                    <td class="ex">@Html.DisplayFor(modelItem => item.DOB)</td>
+                    <td class="ex tex">@item.ppg.ToString("N1", CultureInfo.InvariantCulture)</td>
+                    <td class="ex tex">@item.salary1.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                    <td class="ex tex">@Html.DisplayFor(modelItem => item.NBA2KRating)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div style="padding: 10px;">
+    <p style="font-size: small;">Showing @ViewData["Counter"] players</p>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $(function () {
+        $('#slist').change(function() {
+            $('#mform').submit();
+        });
+    });
+    $(function() {
+        $('#sl').change(function(){
+            $('#mform').submit();
+        });
+    })
+    $(function() {
+        $('#ma').change(function(){
+            $('#mform').submit();
+        });
+    })
+    $(function() {
+        $('#mx').change(function(){
+            $('#mform').submit();
+        });
+    })
+</script>

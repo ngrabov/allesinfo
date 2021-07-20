@@ -1,0 +1,96 @@
+@model IEnumerable<allinfo.Models.Player> 
+@using allinfo.Models
+
+@{
+    ViewData["Title"] = "Upcoming Free Agents";
+    int i = 1;
+    string s;
+    <style media="screen and (max-width: 992px)">
+        .hddn{
+            display: none;
+        }
+    </style>
+    <style media="screen and (min-width: 992px)">
+        .hddn{display:flex;}
+    </style>
+    <style media="screen and (max-width: 576px)">
+        #linktext{font-size: x-small; min-width: 45%;}
+        .vex{
+            display: none;
+        }
+        .agent{
+            background-color: #7B0F28;
+        }
+    </style>
+    <style media="screen and (min-width: 576px)">
+        #linktext{ min-width: 60%;}
+        .agent{
+            background-color: #7B0F28;
+            transition: 0.3s;
+        }
+        .agent:hover{
+            background-color: #7a3b69;
+        }
+        .padd{
+            padding-top: 7px;
+        }
+    </style>
+    <style>
+        .text-block{
+            position: absolute;
+            bottom: -40px;
+            right: 20px;
+            background-color: beige;
+            color: black;
+            padding-left: 20px;
+            padding-right: 20px;
+            border: solid 1px lightgray;
+            border-radius: 10px;
+            max-width: 260px;
+            line-height: 1.9;
+            box-shadow: 0 8px 8px 0px rgba(0,0,0,0.2);
+            font-family: 'Verdana', 'Helvetica', 'sans-serif';
+        }
+    </style>
+}
+
+<div style="width: 100%; position: relative; margin-bottom: 100px;">
+    <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_600,w_900/klaw_fa_uu5zjm.jpg" 
+    style="width: 100%; height: auto;" alt="Error displaying the image." />
+    <div class="text-block">
+        <h4 style="margin-bottom: 20px; font-weight: 900; font-size: 1rem; margin-top: 20px; line-height: 1.2;">2021 NBA FREE AGENCY</h4>
+        <p class="vex" style="font-size: small;">The pool of players for the much-anticipated 2021 free agency class seems to be much shallower than first thought, thanks to numerous extensions agreed. Below is the best of what's left.</p>
+  </div>
+</div>
+
+<div class="container" style="margin-top: 30px; padding: 20px;">
+    @foreach (var item in Model)
+    {
+        <div class="agent" style="height: 40px; width: 100%; display: flex; margin-bottom: 10px; justify-content: space-between;">
+            <p style="color: white; width: 30px; text-align: right; padding-left: 10px; padding-top: 7px;"><b>@i</b></p>
+            <div style="width: 32px; margin-top: 4px;  height: 32px; margin-left: 10px; margin-right: 10px; border-radius: 10px; background-color: white;">
+                <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_50,w_50/@item.AvatarURL" 
+                    style="width: 32px; height: 32px; object-fit: cover; border-radius: 10px;" alt="Err" />
+            </div>
+            @if((int)item.faType == 0)
+            {
+                s = "";
+            }
+            else
+            {
+                s = "(RFA)";
+            }
+            <a asp-controller="Players" asp-action="Details" asp-route-id="@item.ID" id="linktext" style="padding-top: 7px;">
+                <p style="margin-right: 10px; color: white;"><b>@item.FullName.ToUpper()</b> @s</p>
+            </a>
+            <p class="hddn" style="margin-right: 10px; color: white; padding-top: 7px; float: right; width: 30px;">@item.playingPosition</p>
+            <a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamId" style="padding-top: 4px; float: right; width: 50px;">
+                <img class="img" src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_50,w_50/@item.Team.AvatarURL" style="height: 32px; width: 32px;" alt="Err"/>
+            </a>
+            <div class="padd" style="color: white; padding-right: 8px; width: 90px; font-size: small; display: flex; align-items: center; padding-top: 5px;">
+                <p style="margin-top: 0px; margin-bottom: 5px;">@item.contractDetails</p>
+            </div>
+        </div>
+        i++;   
+    }
+</div>

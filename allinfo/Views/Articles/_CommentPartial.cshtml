@@ -1,0 +1,139 @@
+@model allinfo.Models.Article
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+@using allinfo.Data
+
+@inject SignInManager<Writer> SignInManager
+@inject UserManager<Writer> UserManager
+@inject NewsContext context
+
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    IEnumerable<Comment> comments = context.Comments.Where(s => s.ArticleID == Model.ArticleID).OrderByDescending(s => s.TimeWritten).Take(10);
+}
+
+@if(SignInManager.IsSignedIn(User))
+{ 
+    <form asp-controller="Comments" asp-action="Create" asp-route-artid="@Model.ArticleID" style="width: 100%; margin: auto; padding-bottom: 25px;">
+        <textarea name="mtx" id="mtx" style="width: 100%; min-height: 45px; max-height: 150px;" required></textarea>
+        <br>
+        <input type="submit" value="Comment" class="btn" style="background-color: #7B0F28; color: white;">
+    </form>
+}
+<table class="table table-hover" style="padding-top: 15px; width: 100%; font-size: 12px;">
+    <tbody>
+        @foreach (var item in comments)
+        {
+            <tr>
+                <td style="max-width: 15vw; overflow: hidden;">
+                    <b>@Html.DisplayFor(modelItem => item.UserFullName)</b>
+                </td>
+                <td style="max-width: 20vw; overflow: hidden;">
+                    @Html.DisplayFor(modelItem => item.Text)
+                </td>
+                <td style="max-width: 10vw; font-size: 9px;">
+                    @Html.DisplayFor(modelItem => item.TimeWritten)
+
+                @if(SignInManager.IsSignedIn(User) && currentUser!= null &&  (await UserManager.IsInRoleAsync(currentUser, "Administrator") || (currentUser.isModerator) || (currentUser.Id.ToString() == item.UserID)))
+                {
+                    <button id="myBtn" type="button" onclick="loadDoc('@item.Text', '@item.CommentID', '@Model.ArticleID')" 
+                    style="color: black; font-size: 9px; border-style: none; position: absolute; bottom: 16px; right: 24px; background: rgba(0,0,0,0);">Edit</button>
+                    <form asp-controller="Comments" asp-action="Delete" asp-route-artid="@Model.ArticleID" asp-route-mtx="@item.CommentID">
+                        <input type="submit" value="Delete" style="color: black; font-size: 9px; border-style: none; position:absolute; bottom: 1px; right: 24px; background: rgba(0,0,0,0);">
+                    </form>
+                }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="myModalz" class="modalz">
+  <div class="modal-contentzz">
+    <span class="closez" onclick="closeModal()">&times;</span>
+    <form asp-controller="Comments" asp-action="Edit" id="frm">
+        <textarea id="modalText" style="width: 80%;" required></textarea>
+        <input type="hidden" id="comId">
+        <input type="hidden" id="artId">
+        <div>
+            <input onclick="mf()" type="submit" class="btn" value="Update" style="background-color: #7B0F28; color: white;">
+        </div>
+    </form>
+  </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script> 
+<script>
+    function mf()
+    {
+        var idd = $("#comId").val();
+        var txt = $("#modalText").val();
+        var artidd = $("#artId").val();
+        $("#frm").attr("action", "/Comments/Edit?id=" + idd + "&artid=" + artidd + "&txt=" + txt);
+        if(txt != "")
+        {
+            $("#frm").submit();
+        }
+    }
+</script>
+<script>
+    function loadDoc(a, b, c){
+        var modal = document.getElementById("myModalz");
+        modal.style.display = "block";
+         
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            document.getElementById("modalText").innerHTML = a; 
+            document.getElementById("modalText").focus();
+            document.getElementById("comId").setAttribute("value", b);
+            document.getElementById("artId").setAttribute("value", c);
+        }
+        xhttp.open("GET", "./", true);
+        xhttp.send();
+    }
+</script>
+<script>
+    function closeModal(){
+        var modal = document.getElementById("myModalz");
+        modal.style.display = "none";
+    }
+</script>
+<style> 
+.modalz {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-contentzz {
+  background-color: white;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.closez {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.closez:hover,
+.closez:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+</style>

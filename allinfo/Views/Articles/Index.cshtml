@@ -1,0 +1,97 @@
+@model IEnumerable<allinfo.Models.Article>
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+@{
+    ViewData["Title"] = "ALLINfo";
+    var currentUser = await userManager.GetUserAsync(User);
+    bool isAdmin;
+    if(signInManager.IsSignedIn(User) && currentUser!= null && await userManager.IsInRoleAsync(currentUser, "Administrator"))
+    {
+        isAdmin = true;
+    }
+    else
+    {
+        isAdmin = false;
+    }
+
+    <style media="screen and (max-width:600px)">
+        .ex{
+            display: none;
+        }
+    </style>
+    <style>
+        .imgtext{
+            bottom: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 3vh;
+            color: white;
+            padding: 20px 10px 20px 10px;
+        }
+        .containerr{
+            position: relative;
+            text-align: center;
+            color: white;
+        }
+    </style>
+
+    var newart = Model.Where(s => s.isImportant && s.isModerated).OrderByDescending(s => s.TimeWritten).Take(1);
+    IEnumerable<Article> allButNewart = Model.Except(newart);
+    var newarts = newart.FirstOrDefault();
+}
+
+@if(newarts != null)
+{
+    <div class="containerr">
+        <a asp-controller="Articles" asp-action="Read" asp-route-id="@newarts.ArticleID">
+            <img src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_600,w_1000/@newarts.HeadImageURL" style="width: 100%; height: 400px; object-fit: cover; object-position: 50% 10%;" alt="Error displaying the image." />
+            <div class="block" style="position: absolute; background: rgb(54, 44, 40); background: rgba(54, 44, 40, 0.5); bottom: 0px; width:100%;">
+                <div class="imgtext">
+                    @Html.DisplayFor(modelItem => newarts.Headline)
+                </div>
+            </div>
+        </a>
+    </div>
+}
+<div style="padding: 0 15px 0 15px;">
+<table class="table table-hover">
+    <tbody>
+        @foreach (var item in allButNewart.Where(s => s.isModerated).OrderByDescending(s => s.TimeWritten).Take(25))
+        {
+            <tr>
+                @if(!isAdmin)
+                {
+                    <td style="width: 21%;">
+                        <a asp-action="Read" asp-route-id="@item.ArticleID">
+                            <img src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_120,w_200/@item.HeadImageURL" class="img" style="width: 100%; height: 100px; object-fit: cover; object-position: 50% 10%;" alt="Error displaying the image." />
+                        </a>
+                    </td>
+                }
+                <td style="width: 20%;">
+                    <a asp-action="Read" asp-route-id="@item.ArticleID" style="color: #7a3b69;"><b>@Html.DisplayFor(modelItem => item.Headline)</b></a>
+                </td>
+                <td style="width: 15%;" class="ex">
+                    <a asp-controller="Writers" asp-action="Details" asp-route-id="@item.WriterId" style="color: #7a3b69;">@Html.DisplayFor(modelItem => item.WriterName)</a>
+                </td>
+                <td style="width: 12%;" class="ex">
+                    @Html.DisplayFor(modelItem => item.Field)
+                </td>
+                <td style="width: 32%;" class="ex">
+                    @Html.DisplayFor(modelItem => item.SubText)
+                </td>
+                @if(isAdmin)
+                {
+                    <td style="width: 21%;">
+                        <a asp-action="Edit" asp-route-id="@item.ArticleID">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ArticleID">Delete</a>
+                    </td>
+                }
+            </tr>            
+        }
+    </tbody>
+</table>
+</div>

@@ -1,0 +1,130 @@
+@model allinfo.Models.Article
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+
+
+@{
+    ViewData["Title"] = "Edit";
+    var currentUser = await userManager.GetUserAsync(User);
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h1>Edit</h1>
+
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit" id="frm" name="frm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group col-md-8">
+                    <label asp-for="Headline" class="control-label"></label>
+                    <input asp-for="Headline" class="form-control" />
+                    <span asp-validation-for="Headline" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <label asp-for="SubHeadline" class="control-label"></label>
+                    <input asp-for="SubHeadline" class="form-control" required/>
+                    <span asp-validation-for="SubHeadline" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group col-md-8">
+                    @foreach (var item in System.Enum.GetValues(typeof(Field)))
+                    {
+                        @if (Model.Field == (Field)item)
+                        {
+                            <label asp-for="Field">@item</label>
+                            <input type="radio" asp-for="Field" asp-route-field="@item" value="@((int)item)" checked />
+                        }
+                        else
+                        {
+                            <label asp-for="Field">@item</label>
+                            <input type="radio" asp-for="Field" asp-route-field="@item" value="@((int)item)" />
+                        }
+                    }
+                    <span asp-validation-for="Field" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label asp-for="Text" class="control-label"></label>
+                    <textarea id="mytextarea" asp-for="Text" class="mceEditor" style="width: 100%;" rows="20"></textarea>
+                    <span asp-validation-for="Text" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-4">
+                    <input type="checkbox" asp-for="isImportant" id="isImportant" name="isImportant" value="true">
+                    <label for="isImportant"> Is important?</label><br>
+                </div>
+
+                <div class="form-group col-md-8">
+                    <b><label asp-for="Tags" class="control-label"></label></b>
+                    <input asp-for="Tags" class="form-control" required/>
+                    <span asp-validation-for="Tags" class="text-danger"></span>
+                </div>
+                @if(currentUser.isModerator || await userManager.IsInRoleAsync(currentUser, "Administrator"))
+                {
+                    <div class="form-group col-md-8">
+                        <input type="checkbox" asp-for="isModerated" asp-route-id="ArticleID" value="true">
+                        <label for="isModerated"> Moderate</label><br>
+                    </div>
+                }
+                <div class="form-group col-md-12">
+                    <input type="button" value="Save" onclick="getme()" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-primary">Back to List</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/kbo8kk4a7jml4jgkcyyjv8yjb41yhjjuumhv5rsjtw4c48vu/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>tinymce.init({
+        selector:'#mytextarea',
+        plugins: 'autolink lists media image importcss table preview charmap code twitter_url',
+        toolbar: 'a11ycheck addcomment showcomments casechange charmap checklist code formatpainter image imagetools media pageembed permanentpen table preview twitter_url',
+        toolbar_mode: 'floating',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        editor_selector: "mceEditor",
+        content_style: "p { margin: 6px; }",
+        media_live_embeds: true
+	 });
+     function getme()
+     {
+        var content = tinymce.get('mytextarea').getContent();
+        if(content == '')
+        {
+            alert('Text field is empty.');
+        }
+        else
+        {
+            $("#frm").submit();
+        }
+     }
+</script>
+
+<script>
+        window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+
+            t._e = [];
+            t.ready = function(f) {
+                t._e.push(f);
+            };
+
+            return t;
+        }(document, "script", "twitter-wjs"));
+    </script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

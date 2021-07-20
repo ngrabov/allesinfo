@@ -1,0 +1,134 @@
+@model allinfo.Models.Article
+@using Microsoft.AspNetCore.Identity
+@using allinfo.Models
+
+@inject SignInManager<Writer> signInManager
+@inject UserManager<Writer> userManager
+@{
+    ViewData["Title"] = "Create";
+    var currentUser = await userManager.GetUserAsync(User);
+}
+
+<div style="padding: 0 15px 0 15px;">
+    <h1>Create an article</h1>
+
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create" id="frm" name="frm" enctype="multipart/form-data"> 
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group col-md-8">
+                    <b><label asp-for="Headline" class="control-label"></label></b>
+                    <input asp-for="Headline" class="form-control" required/>
+                    <span asp-validation-for="Headline" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <b><label asp-for="SubHeadline" class="control-label"></label></b>
+                    <input asp-for="SubHeadline" class="form-control" required/>
+                    <span asp-validation-for="SubHeadline" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <label asp-for="HeadImageURL" class="control-label"><b>Select image:</b></label>
+                    <input type="file" name="file" aria-label="Select image:" accept="image/*" />
+                    <span asp-validation-for="HeadImageURL" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group col-md-8">
+                    <div>
+                        <label asp-for="Field" class="control-label"><b>Article group:</b></label>
+                    </div>
+                    @foreach (var item in System.Enum.GetValues(typeof(Field)))
+                    {
+                        <div>
+                            <label asp-for="Field">@item</label>
+                            <input type="radio" asp-for="Field" value="@((int)item)" checked />
+                        </div>
+                    }
+                    <span asp-validation-for="Field" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <b><label asp-for="Writer" class="control-label"></label></b>
+                    <select asp-for="WriterId" aria-label="Writer" class="form-control" asp-items="@ViewBag.WriterId">
+                        <option value="">-- Select Writer --</option>
+                    </select>
+                    <span asp-validation-for="WriterId" class="text-danger" />
+                </div> 
+
+                <div class="form-group col-md-12" style="z-index: 0;">
+                    <b><label asp-for="Text" class="control-label"></label></b>
+                    <textarea asp-for="Text" id="mytextarea" class="mceEditor" style="width: 100%;" rows="20"></textarea> 
+                    <span asp-validation-for="Text" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-4">
+                    <input type="checkbox" asp-for="isImportant" id="isImportant" name="isImportant" value="true">
+                    <label for="isImportant"> Is important?</label><br>
+                </div>
+
+                <div class="form-group col-md-8">
+                    <b><label asp-for="Tags" class="control-label"></label></b>
+                    <input asp-for="Tags" class="form-control" required/>
+                    <span asp-validation-for="Tags" class="text-danger"></span>
+                </div>
+                @if(currentUser.isModerator || await userManager.IsInRoleAsync(currentUser, "Administrator"))
+                {
+                    <div class="form-group col-md-8">
+                        <input type="checkbox" asp-for="isModerated" asp-route-id="ArticleID" value="true">
+                        <label for="isModerated"> Moderate</label><br>
+                    </div>
+                }
+                <div class="form-group col-md-12">
+                    <input type="button" onclick="getme()" value="Create" class="btn btn-primary" style="background-color: #7B0F28;" />
+                    <a asp-action="Index" class="btn btn-primary" style="background-color: #7B0F28;">Back to List</a>
+                </div>   
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+<script src="https://cdn.tiny.cloud/1/kbo8kk4a7jml4jgkcyyjv8yjb41yhjjuumhv5rsjtw4c48vu/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>tinymce.init({
+        selector:'#mytextarea',
+        plugins: 'autolink lists media image importcss table preview charmap code twitter_url',
+        toolbar: 'a11ycheck addcomment showcomments casechange charmap checklist code formatpainter image imagetools media pageembed permanentpen table preview twitter_url',
+        toolbar_mode: 'floating',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        editor_selector: "mceEditor",
+        content_style: "p { margin: 6px; }",
+        media_live_embeds: true
+	 });
+     function getme()
+     {
+        var content = tinymce.get('mytextarea').getContent();
+        if(content == '')
+        {
+            alert('Text field is empty.');
+        }
+        else
+        {
+            $("#frm").submit();
+        }
+     }
+</script>
+<script>
+        window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+
+            t._e = [];
+            t.ready = function(f) {
+                t._e.push(f);
+            };
+
+            return t;
+        }(document, "script", "twitter-wjs"));
+    </script>
