@@ -1,0 +1,22 @@
+{
+    "short_name": "All-NBA.net",
+    "name": "All-NBA - Your source for all things NBA",
+    "icons": [
+      {
+        "src": "/NBA-icon192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/NBA-icon.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": "/?source=pwa",
+    "background_color": "#9a879d",
+    "display": "fullscreen",
+    "scope": "/",
+    "theme_color": "#7a3b69",
+    "description": "Your most complete NBA related web portal."
+  }

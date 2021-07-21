@@ -4,8 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Description" content="A simple news-related web page with login and comment system."/>
+    <meta name="theme-color" content="#7a3b69">
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="manifest" href="~/manifest.json">
     <script src="~/js/fa.js"></script>
     <link rel="stylesheet" href="~/css/site.css" />
     <style>
@@ -216,7 +218,7 @@
 <body style="background-color: #9a879d;">
     <header style="position: sticky; top: 0; z-index: 1;">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark" style="background-color: #7a3b69; position: sticky; top: 0;">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color: white; font-weight: bold; margin-right: 0px;"><img src="~/nba.ico" style="height: 32px; width:32px;" alt="myimg"></img> ALLINfo </a> 
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color: white; font-weight: bold; margin-right: 0px;"><img src="~/nba.ico" style="height: 32px; width:32px;" alt="myimg"></img> ALLNBA </a> 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -272,7 +274,7 @@
                 <a href="https://instagram.com/nikola.grabovacds" rel="noreferrer" target="_blank" style="padding: 15px 10px;" title="IG"><i class="fab fa-instagram" style="color: white; font-size: 24px;" ></i>   </a>
             </div>
             <div style="display: flex; justify-content: center;">
-                &copy; 2021 ALLINfo
+                &copy; @DateTime.Now.Year ALLNBA
             </div>
             <div style="display: flex; justify-content: center; font-size: 12px;">
                 <a asp-controller="Home" asp-action="Privacy" style="color: white;">Privacy</a>
