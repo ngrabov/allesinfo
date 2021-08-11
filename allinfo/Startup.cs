@@ -38,6 +38,9 @@ namespace allinfo
                         new[] { "image/svg+xml" });
             });
 
+            services.AddScoped<IHomeRepository, HomeRepository>();
+            services.AddScoped<IArticlesRepository, ArticlesRepository>();
+
             services.AddRazorPages();
             services.AddWebOptimizer();
 

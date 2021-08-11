@@ -12,35 +12,37 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using System.Collections.Generic;
 
 namespace allinfo.Controllers
 {
     public class ArticlesController : Controller
     {
-        private readonly NewsContext _context;
+        private IArticlesRepository articlesRepository;
         private readonly UserManager<Writer> _userManager;
         private readonly SignInManager<Writer> _signInManager;
 
-        public ArticlesController(NewsContext context, UserManager<Writer> userManager, SignInManager<Writer> signInManager)
+        public ArticlesController(IArticlesRepository articlesRepository, UserManager<Writer> userManager, SignInManager<Writer> signInManager)
         {
-            _context = context;
+            this.articlesRepository = articlesRepository;
             _userManager = userManager;
             _signInManager = signInManager;
         }
         public async Task<IActionResult> Index(Field? field, string tag)
         {
+            Task<List<Article>> articles;
             if(tag != null)
             {
-                var articles3 = _context.Articles.Where(c => c.Tags.Contains(tag)).Include(c => c.Writer).AsNoTracking();
-                return View(await articles3.ToListAsync());
+                articles = articlesRepository.GetArticlesByTagAsync(tag);
+                return View(await articles);
             }
             if(field == null)
             {
-                var articles = _context.Articles.Include(c => c.Writer).AsNoTracking();
-                return View(await articles.ToListAsync());
+                articles = articlesRepository.GetArticlesGeneralAsync();
+                return View(await articles);
             }
-            var articles2 = _context.Articles.Where(d => d.Field == field).Include(c => c.Writer).AsNoTracking();
-            return View(await articles2.ToListAsync());
+            articles = articlesRepository.GetArticlesByFieldAsync(field);
+            return View(await articles);
         }
 
         [Authorize(Roles = "Administrator,Manager")]
@@ -51,8 +53,8 @@ namespace allinfo.Controllers
             {
                 return Forbid();
             }
-            var articles = _context.Articles.Where(d => !d.isModerated).Include(c => c.Writer).AsNoTracking();
-            return View(await articles.ToListAsync());
+            var articles = articlesRepository.GetArticlesForModerationAsync();
+            return View(await articles);
         }
 
         [HttpPost,ActionName("Moderation")]
@@ -75,10 +77,7 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
-            var article = await _context.Articles
-                    .Include(c => c.Writer)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.ArticleID == id);
+            var article = await articlesRepository.GetArticleByIDAsync(id);
 
             if (article == null)
             {
@@ -128,9 +127,9 @@ namespace allinfo.Controllers
 
                     article.HeadImageURL = webp;
                     article.TimeWritten = DateTime.Now;
-                    article.Writer = await _context.Writers.FindAsync(article.WriterId);
-                    _context.Add(article);
-                    await _context.SaveChangesAsync();
+                    article.Writer = await articlesRepository.GetWriterByIDAsync(article.WriterId);
+                    articlesRepository.AddArticleAsync(article);
+                    await articlesRepository.SaveAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch(DbUpdateException)
@@ -156,26 +155,26 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
+            Article article;
             if(currentUser.isAdmin || currentUser.isModerator)
             {
-                var article = await _context.Articles.AsNoTracking()
-                            .FirstOrDefaultAsync(m => m.ArticleID == id);
+                article = await articlesRepository.GetArticleByIDAsync(id);
 
                 if(article == null)
                 {
                     return Forbid();
                 }
+
                 return View(article);
             }
 
-            var article2 = await _context.Articles.Where(x => x.WriterId == currentUser.Id).AsNoTracking()
-                            .FirstOrDefaultAsync(m => m.ArticleID == id);
+            article = await articlesRepository.GetArticleByWriterIDAsync(currentUser.Id, id); 
 
-            if(article2 == null)
+            if(article == null)
             {
                 return Forbid();
             }
-            return View(article2);
+            return View(article);
         }
 
         [Authorize(Roles = "Administrator,Manager")]
@@ -188,14 +187,13 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
-            var articleToUpdate = await _context.Articles.Include(w => w.Writer)
-                        .FirstOrDefaultAsync(c => c.ArticleID == id);
+            var articleToUpdate = await articlesRepository.GetArticleByIDAsync(id);
 
             var currentUser = await _userManager.GetUserAsync(User);
             if(await TryUpdateModelAsync<Article>(
                 articleToUpdate,
                 "",
-                c => c.Headline,/*  c => c.WriterId, */ c => c.Text, c => c.Field, c => c.SubHeadline, c => c.isImportant, c => c.Tags, c => c.isModerated
+                c => c.Headline, c => c.WriterId, c => c.Text, c => c.Field, c => c.SubHeadline, c => c.isImportant, c => c.Tags, c => c.isModerated
                 ))
             {
                 try
@@ -205,7 +203,7 @@ namespace allinfo.Controllers
                         articleToUpdate.isModerated = false;
                     } 
                     
-                    await _context.SaveChangesAsync();
+                    await articlesRepository.SaveAsync();
                 }
                 catch(DbUpdateException)
                 {
@@ -231,29 +229,26 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
+            Article article;
             if(currentUser.isAdmin)
             {
-                var article = await _context.Articles
-                    .Include(c => c.Writer)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.ArticleID == id);
+                article = await articlesRepository.GetArticleByIDAsync(id);
+
                 if(article == null)
                 {
                     return Forbid();
                 }
+
                 return View(article);
             }
 
-            var article2 = await _context.Articles.Where(x => x.WriterId == currentUser.Id)
-                    .Include(c => c.Writer)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.ArticleID == id);
-            if(article2 == null)
+            article = await articlesRepository.GetArticleByWriterIDAsync(currentUser.Id, id);
+            if(article == null)
             {
                 return Forbid();
             }
 
-            return View(article2);
+            return View(article);
         }
 
         [Authorize(Roles = "Administrator,Manager")]
@@ -261,9 +256,9 @@ namespace allinfo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var article = await _context.Articles.FindAsync(id);
-            _context.Articles.Remove(article);
-            await _context.SaveChangesAsync();
+            var article = await articlesRepository.GetArticleByIDAsync(id);
+            articlesRepository.RemoveArticleAsync(article);
+            await articlesRepository.SaveAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -271,14 +266,14 @@ namespace allinfo.Controllers
         {
             var currentUser = await _userManager.GetUserAsync(User);
             
-            var writersQuery = from s in _context.Writers
+            var writersQuery = from s in articlesRepository.GetWritersAsync()
                                 where s.Id == currentUser.Id
                                 orderby s.FirstName
                                 select s;
 
             if(_signInManager.IsSignedIn(User) && currentUser!= null && await _userManager.IsInRoleAsync(currentUser, "Administrator"))
             {
-                writersQuery = from s in _context.Writers
+                writersQuery = from s in articlesRepository.GetWritersAsync()
                                 where s.isManager == true
                                 orderby s.FirstName
                                 select s;
