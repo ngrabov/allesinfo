@@ -15,18 +15,18 @@ namespace allinfo.Controllers
 {
     public class TeamsController : Controller
     {
-        private readonly NewsContext _context;
+        private ITeamsRepository teamsRepository;
 
-        public TeamsController(NewsContext context)
+        public TeamsController(ITeamsRepository teamsRepository)
         {
-            _context = context;
+            this.teamsRepository = teamsRepository;
         }
 
         public async Task<IActionResult> Index()
         {
             var teams = new List<Team>();
 
-            var group = from team in await _context.Teams.ToListAsync()
+            var group = from team in await teamsRepository.GetTeamsAsync().ToListAsync() 
                         group team by team.division into divTeam //Team.division, Team
                         orderby divTeam.Key
                         select divTeam;
@@ -46,29 +46,33 @@ namespace allinfo.Controllers
         {
             Team team;
             List<Team> teams;
-            IQueryable<Player> players;
+            List<Player> players;
             double avg = 0.0;
-            teams = await _context.Teams.AsNoTracking().OrderByDescending(c => c.payroll).ToListAsync();
+            teams = await teamsRepository.GetTeamsByPayrollAsync();
             ViewData["Payrolls"] = teams;
             if(id != null)
             {
-                team = await _context.Teams.AsNoTracking().FirstOrDefaultAsync(c => c.ID == id);
-                players = _context.Players.AsNoTracking().Where(c => c.TeamId == id).OrderByDescending(c => c.salary1);
+                team = await teamsRepository.GetTeamByID(id); 
+                players = await teamsRepository.GetPlayersByTeamID(id);
+            }
+            else if(teamsRepository.GetAbbsAsync(abb) == 1)
+            {
+                team = await teamsRepository.GetTeamByAbb(abb);
+                players = await teamsRepository.GetPlayersByTeamAbb(abb);
             }
             else
             {
-                team = await _context.Teams.AsNoTracking().FirstOrDefaultAsync(c => c.ShortName == abb);
-                players = _context.Players.AsNoTracking().Where(c => c.Team.ShortName == abb).OrderByDescending(c => c.salary1);
+                return NotFound();
             }
-            //avg = await players.AverageAsync(s => s.age);
+
             foreach(var item in players)
             {
                 avg += item.age;
             }
             avg /= players.Count();
             ViewData["Avgs"] = avg;
-            ViewData["Salary"] = await players.ToListAsync();
-            var articls = await _context.Articles.AsNoTracking().Where(c => c.Tags.Contains(team.Name.Substring(0, 5))).OrderByDescending(c => c.TimeWritten).ToListAsync();
+            ViewData["Salary"] = players;
+            var articls = await teamsRepository.GetArticlesByTag(team.Name.Substring(0, 5));
             ViewData["Artcls"] = articls;
             return View(team);
         }
@@ -77,7 +81,7 @@ namespace allinfo.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if(id == null) return NotFound();
-            var team = await _context.Teams.FirstOrDefaultAsync(c => c.ID == id);
+            var team = await teamsRepository.GetTeamByID(id);
             if(team == null) return NotFound();
             return View(team);
         }
@@ -88,7 +92,7 @@ namespace allinfo.Controllers
         public async Task<IActionResult> EditPost(int? id, IFormFile file)
         {
             if(id == null) return NotFound();
-            var team = await _context.Teams.FirstOrDefaultAsync(c => c.ID == id);
+            var team = await teamsRepository.GetTeamByID(id); 
 
             if(file != null)
             {
@@ -97,7 +101,7 @@ namespace allinfo.Controllers
                     try
                     {
                         team.AvatarURL = await UploadMe(file);
-                        await _context.SaveChangesAsync();
+                        await teamsRepository.SaveAsync(); 
                         return RedirectToAction(nameof(Index));
                     }
                     catch(DbUpdateException)
