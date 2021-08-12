@@ -31,16 +31,19 @@ namespace allinfo.Controllers
         public async Task<IActionResult> Index(Field? field, string tag)
         {
             Task<List<Article>> articles;
+
             if(tag != null)
             {
                 articles = articlesRepository.GetArticlesByTagAsync(tag);
                 return View(await articles);
             }
+            
             if(field == null)
             {
                 articles = articlesRepository.GetArticlesGeneralAsync();
                 return View(await articles);
             }
+
             articles = articlesRepository.GetArticlesByFieldAsync(field);
             return View(await articles);
         }

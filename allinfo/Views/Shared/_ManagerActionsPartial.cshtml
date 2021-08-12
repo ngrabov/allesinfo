@@ -13,6 +13,6 @@
     if(isManager)
     {
         <a class="nex" style="padding-left: 12px; padding-right: 12px;" asp-area="" asp-controller="Articles" asp-action="Create"> New article</a>
-        <a class="nex" style="padding-left: 12px; padding-right: 12px;" asp-controller="Writers" asp-action="Details" asp-route-id="@currentUser.Id"> @currentUser.FirstName</a>
+        <a class="nex" style="padding-left: 12px; padding-right: 12px;" asp-controller="Writers" asp-action="Details" asp-route-id="@currentUser.Id"> @currentUser.FirstName - articles</a>
     }
 }

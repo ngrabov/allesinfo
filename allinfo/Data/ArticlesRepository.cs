@@ -40,7 +40,7 @@ namespace allinfo.Data
 
         public async Task<Article> GetArticleByIDAsync(int? id)
         {
-            return await context.Articles.Include(c => c.Writer).AsNoTracking().FirstOrDefaultAsync(m => m.ArticleID == id);
+            return await context.Articles.Include(c => c.Writer).FirstOrDefaultAsync(m => m.ArticleID == id);
         }
 
         public async Task<Article> GetArticleByWriterIDAsync(int currentUserID, int? id)

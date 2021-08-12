@@ -11,13 +11,13 @@ namespace allinfo.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly NewsContext _context;
+        private ICommentsRepository commentsRepository;
         private readonly UserManager<Writer> _userManager;
         private readonly SignInManager<Writer> _signInManager;
 
-        public CommentsController(NewsContext context, UserManager<Writer> userManager, SignInManager<Writer> signInManager)
+        public CommentsController(ICommentsRepository commentsRepository, UserManager<Writer> userManager, SignInManager<Writer> signInManager)
         {
-            _context = context;
+            this.commentsRepository = commentsRepository;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -34,9 +34,8 @@ namespace allinfo.Controllers
                 var currentUser = await _userManager.GetUserAsync(User);
                 comment.UserFullName = currentUser.FullName;
                 comment.ArticleID = artid;
-                _context.Add(comment);
-                
-                await _context.SaveChangesAsync();
+                commentsRepository.AddCommentAsync(comment);
+                await commentsRepository.SaveAsync();
             }
             catch(DbUpdateException)
             {
@@ -54,10 +53,10 @@ namespace allinfo.Controllers
         {
             try
             {
-                var comment = await _context.Comments.FindAsync(id);
+                var comment = await commentsRepository.GetCommentByIDAsync(id);
                 comment.TimeWritten = DateTime.Now;
                 comment.Text = txt;
-                await _context.SaveChangesAsync();
+                await commentsRepository.SaveAsync();
             }
             catch(DbUpdateException)
             {
@@ -74,9 +73,9 @@ namespace allinfo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int mtx, int artid)
         {
-            var comment = await _context.Comments.FindAsync(mtx);
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+            var comment = await commentsRepository.GetCommentByIDAsync(mtx);
+            commentsRepository.RemoveCommentAsync(comment);
+            await commentsRepository.SaveAsync();
             return Redirect($"../Articles/Read/{artid}");
         }
     }
