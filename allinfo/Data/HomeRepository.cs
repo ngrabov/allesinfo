@@ -33,14 +33,15 @@ namespace allinfo.Data
             var config = Configuration.Default.WithDefaultLoader();
             var ctx = BrowsingContext.New(config);
             var dogg2 = await ctx.OpenAsync("http://www.espn.com/nba/seasonleaders/_/league/nba/sort/avgPoints");
-            var namesrows = dogg2.QuerySelectorAll("td[align='left'] a").Take(30).ToArray();
-            var pointrows = dogg2.QuerySelectorAll("td.sortcell").Take(30).ToArray();
+            var namesrows = dogg2.QuerySelectorAll("td[align='left'] a").Take(50).ToArray();
+            var pointrows = dogg2.QuerySelectorAll("td.sortcell").Take(50).ToArray();
 
             List<string> results = new List<string>();
+            IQueryable<Player> playerz = context.Players.AsQueryable();
             int i;
             for(i = 0; i < namesrows.Count() ; i++)
             {
-                Player player = await context.Players.Where(c => c.FullName == namesrows[i].TextContent).FirstOrDefaultAsync();
+                Player player = await playerz.Where(c => c.FullName == namesrows[i].TextContent).FirstOrDefaultAsync();
                 if(player != null)
                 {
                     player.ppg = double.Parse(pointrows[i].TextContent, CultureInfo.InvariantCulture);
