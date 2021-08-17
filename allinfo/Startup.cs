@@ -42,6 +42,9 @@ namespace allinfo
             services.AddScoped<IArticlesRepository, ArticlesRepository>();
             services.AddScoped<ICommentsRepository, CommentsRepository>();
             services.AddScoped<ITeamsRepository, TeamsRepository>();
+            services.AddScoped<IWritersRepository, WritersRepository>();
+            services.AddScoped<IProspectsRepository, ProspectsRepository>();
+            services.AddScoped<IPlayersRepository, PlayersRepository>();
 
             services.AddRazorPages();
             services.AddWebOptimizer();

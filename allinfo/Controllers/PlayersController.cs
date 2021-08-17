@@ -19,13 +19,13 @@ namespace allinfo.Controllers
 {
     public class PlayersController : Controller
     {
-        private readonly NewsContext _context;
+        private IPlayersRepository playersRepository;
         private readonly SignInManager<Writer> _signInManager;
         private readonly UserManager<Writer> _userManager;
 
-        public PlayersController(NewsContext context, SignInManager<Writer> signInManager, UserManager<Writer> userManager)
+        public PlayersController(IPlayersRepository playersRepository, SignInManager<Writer> signInManager, UserManager<Writer> userManager)
         {
-            _context = context; 
+            this.playersRepository = playersRepository; 
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -33,10 +33,9 @@ namespace allinfo.Controllers
         [HttpGet]
         public async Task<IActionResult> UpcomingFA()
         {
-            var fa = await _context.Players.Include(c => c.Team).
-                Where(c => c.contractLength == 1 || ((int)c.contractOption != 3 && c.contractLength == 2)).OrderByDescending(c => c.NBA2KRating).ThenByDescending(c => c.DOB).ToListAsync();
+            var fa = await playersRepository.GetFreeAgentsAsync();
             
-            var articles = await _context.Articles.OrderByDescending(c => c.TimeWritten).Take(10).ToListAsync();
+            var articles = await playersRepository.GetArticlesAsync();
             ViewData["SShow"] = articles;
             return View(fa);
         }
@@ -86,11 +85,11 @@ namespace allinfo.Controllers
 
             if(model.TeamId != null) 
             {
-                players = _context.Players.Include(c => c.Team).Include(c => c.Nationality).Where(c => c.TeamId == model.TeamId).AsNoTracking();
+                players = playersRepository.GetPlayersByTeamAsync(model.TeamId);
             }
             else
             {
-                players = _context.Players.Include(c => c.Team).Include(c => c.Nationality).AsNoTracking();
+                players = playersRepository.GetPlayersAsync();
             }
 
             if(model.position != null)
@@ -160,8 +159,8 @@ namespace allinfo.Controllers
             {
                 return NotFound();
             }
-            var player = await _context.Players.Include(c => c.Team).Include(c => c.Nationality).AsNoTracking().FirstOrDefaultAsync(c => c.ID == id);
-            var artcls = await _context.Articles.Where(c => c.Tags.Contains(player.LastName)).Where(c => c.Tags.Contains(player.TeamName.Substring(0, 5))).OrderByDescending(c => c.TimeWritten).AsNoTracking().ToListAsync();
+            var player = await playersRepository.GetPlayerByIDAsync(id);
+            var artcls = await playersRepository.GetArticlesByTagAsync(player);
 
             ViewData["Art"] = artcls;
             if(player == null)
@@ -211,7 +210,7 @@ namespace allinfo.Controllers
                     ImageUploadResult uploadResult = cloudinary.Upload(uploadParams);
 
                     player.AvatarURL = webp;
-                    player.Team = await _context.Teams.FindAsync(player.TeamId);
+                    player.Team = await playersRepository.GetTeamByPlayerIDAsync(player.TeamId);
                     player.Team.payroll += player.salary1;
                     player.contractLength = 5;
                     var salaries = new double[]{player.salary2, player.salary3, player.salary4, player.salary5};
@@ -224,9 +223,9 @@ namespace allinfo.Controllers
                             break;
                         }
                     }
-                    player.Nationality = await _context.Nationalities.FindAsync(player.NationalityID);
-                    _context.Add(player);
-                    await _context.SaveChangesAsync();
+                    player.Nationality = await playersRepository.GetNationalityAsync(player.NationalityID);
+                    playersRepository.AddPlayer(player);
+                    await playersRepository.SaveAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch(DbUpdateException)
@@ -246,7 +245,7 @@ namespace allinfo.Controllers
 
             if(id == null) return NotFound();
 
-            var player = await _context.Players.FindAsync(id);
+            var player = await playersRepository.GetPlayerByIDAsync(id);
 
             if(player == null)
             {
@@ -266,7 +265,7 @@ namespace allinfo.Controllers
             {
                 return NotFound();
             }
-            var player = await _context.Players.Include(c => c.Team).Include(c => c.Nationality).FirstOrDefaultAsync(c => c.ID == id);
+            var player = await playersRepository.GetPlayerByIDAsync(id);
             
             if(file != null)
             {
@@ -311,10 +310,10 @@ namespace allinfo.Controllers
 
                         player.AvatarURL = webp;
                         player.Team.payroll -= player.salary1;
-                        player.Team = await _context.Teams.FindAsync(player.TeamId);
+                        player.Team = await playersRepository.GetTeamByPlayerIDAsync(player.TeamId);
                         player.Team.payroll += player.salary1;
-                        player.Nationality = await _context.Nationalities.FindAsync(player.NationalityID);
-                        await _context.SaveChangesAsync();
+                        player.Nationality = await playersRepository.GetNationalityAsync(player.NationalityID);
+                        await playersRepository.SaveAsync();
                         return RedirectToAction(nameof(Index));
                     }
                     catch(DbUpdateException)
@@ -331,13 +330,13 @@ namespace allinfo.Controllers
 
         private async void populateTeams(object selectedTeam = null)
         {
-            var teams = await _context.Teams.OrderBy(c => c.Name).ToArrayAsync();
+            var teams = await playersRepository.GetTeamsAsync();
             ViewBag.teams = new SelectList(teams, "ID", "Name", selectedTeam);
         }
 
         private async void populateNations(object selectedNation = null)
         {
-            var nations = await _context.Nationalities.OrderBy(c => c.nationalityName).ToArrayAsync();
+            var nations = await playersRepository.GetNationalitiesAsync();
             ViewBag.nations = new SelectList(nations, "ID", "nationalityName", selectedNation);
         }
     }

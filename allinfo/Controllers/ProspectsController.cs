@@ -17,12 +17,12 @@ namespace allinfo.Controllers
 {
     public class ProspectsController : Controller
     {
-        private readonly NewsContext _context;
+        private IProspectsRepository prospectsRepository;
         private readonly SignInManager<Writer> _signInManager;
         private readonly UserManager<Writer> _userManager;
-        public ProspectsController(NewsContext context, SignInManager<Writer> signInManager, UserManager<Writer> userManager)
+        public ProspectsController(IProspectsRepository prospectsRepository, SignInManager<Writer> signInManager, UserManager<Writer> userManager)
         {
-            _context = context;
+            this.prospectsRepository = prospectsRepository;
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -30,7 +30,7 @@ namespace allinfo.Controllers
         public async Task<IActionResult> MockDraft(TeamsViewModel model)
         {
             var vm = new TeamsViewModel();
-            var prospects = await _context.Prospects.Include(c => c.Team).OrderBy(c => c.rank).Take(30).AsNoTracking().ToListAsync();
+            var prospects = await prospectsRepository.GetProspectsAsync(); 
             vm.Prospects = prospects;
             return View(vm);
         }
@@ -74,10 +74,10 @@ namespace allinfo.Controllers
 
                     ImageUploadResult uploadResult = cloudinary.Upload(uploadParams);
                     prospect.aviUrl = webp;
-                    prospect.Team = await _context.Teams.FindAsync(prospect.TeamId);
+                    prospect.Team = await prospectsRepository.GetPlayersTeamByID(prospect.TeamId);
 
-                    _context.Add(prospect);
-                    await _context.SaveChangesAsync();
+                    prospectsRepository.AddProspect(prospect);
+                    await prospectsRepository.SaveAsync();
                     return RedirectToAction(nameof(MockDraft));
                 }
                 catch(DbUpdateException)
@@ -97,7 +97,7 @@ namespace allinfo.Controllers
 
             if(id == null) return NotFound();
 
-            var prospect = await _context.Prospects.FindAsync(id);
+            var prospect = await prospectsRepository.GetProspectByIDAsync(id);
 
             if(prospect == null)
             {
@@ -116,7 +116,7 @@ namespace allinfo.Controllers
             {
                 return NotFound();
             }
-            var prospect = await _context.Prospects.Include(c => c.Team).FirstOrDefaultAsync(c => c.ID == id);
+            var prospect = await prospectsRepository.GetProspectByIDAsync(id);
             
             if(file != null)
             {
@@ -149,7 +149,7 @@ namespace allinfo.Controllers
                         ImageUploadResult uploadResult = cloudinary.Upload(uploadParams);
 
                         prospect.aviUrl = webp;
-                        await _context.SaveChangesAsync();
+                        await prospectsRepository.SaveAsync();
                         return RedirectToAction(nameof(MockDraft));
                     }
                     catch(DbUpdateException)
@@ -164,7 +164,7 @@ namespace allinfo.Controllers
  
         private async void populateTeams(object selectedTeam = null)
         {
-            var teams = await _context.Teams.OrderBy(c => c.Name).ToArrayAsync();
+            var teams = await prospectsRepository.GetTeamsAsync();
             ViewBag.teams = new SelectList(teams, "ID", "Name", selectedTeam);
         }
     }

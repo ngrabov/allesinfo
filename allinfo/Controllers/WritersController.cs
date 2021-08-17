@@ -13,13 +13,13 @@ namespace allinfo.Controllers
 {
     public class WritersController : Controller
     {
-        private readonly NewsContext _context;
+        private IWritersRepository writersRepository;
         private readonly UserManager<Writer> _userManager;
         private readonly SignInManager<Writer> _signInManager;
 
-        public WritersController(NewsContext context, UserManager<Writer> userManager, SignInManager<Writer> signInManager)
+        public WritersController(IWritersRepository writersRepository, UserManager<Writer> userManager, SignInManager<Writer> signInManager)
         {
-            _context = context;
+            this.writersRepository = writersRepository;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -66,7 +66,7 @@ namespace allinfo.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            var writers = from s in _context.Writers.Include(w => w.Articles)
+            var writers = from s in writersRepository.GetWritersAsync()
                         where s.isAdmin == false && s.isManager 
                         select s;
 
@@ -112,10 +112,7 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
-            var writer = await _context.Writers
-                        .Include(w => w.Articles)
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(m => m.Id == id);
+            var writer = await writersRepository.GetWriterByIDAsync(id);
             
             if(writer == null)
             {
@@ -142,10 +139,10 @@ namespace allinfo.Controllers
                 writer.isAdmin = false;
                 writer.isManager = true;
                 writer.UserName = writer.Email;
-                _context.Add(writer);
+                writersRepository.AddWriterAsync(writer);
                 var result = await _userManager.CreateAsync(writer, pw);
                 await _userManager.AddToRoleAsync(writer, "Manager");
-                await _context.SaveChangesAsync();
+                await writersRepository.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch(DbUpdateException)
@@ -164,7 +161,7 @@ namespace allinfo.Controllers
             {
                 return NotFound();
             }
-            var writer = await _context.Writers.FindAsync(id);
+            var writer = await writersRepository.GetWriterByIDAsync(id);
             if(writer == null)
             {
                 return NotFound();
@@ -182,8 +179,7 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
-            var writerToUpdate = await _context.Writers/* .Include(w => w.Articles) */
-                        .FirstOrDefaultAsync(s => s.Id == id);
+            var writerToUpdate = await writersRepository.GetWriterByIDAsync(id);
 
             if(await TryUpdateModelAsync<Writer>(
                 writerToUpdate,
@@ -194,7 +190,7 @@ namespace allinfo.Controllers
                 try
                 {
                     var result = _userManager.UpdateAsync(writerToUpdate);
-                    await _context.SaveChangesAsync();
+                    await writersRepository.SaveAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch(DbUpdateException)
@@ -215,9 +211,7 @@ namespace allinfo.Controllers
                 return NotFound();
             }
 
-            var writer = await _context.Writers
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var writer = await writersRepository.GetWriterByIDAsync(id);
 
             if (writer.isAdmin == true)
             {
@@ -243,7 +237,7 @@ namespace allinfo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            var writer = await _context.Writers.FindAsync(id);
+            var writer = await writersRepository.GetWriterByIDAsync(id);
             if(writer == null)
             {
                 return RedirectToAction(nameof(Index));
@@ -256,8 +250,8 @@ namespace allinfo.Controllers
 
             try
             {
-                _context.Writers.Remove(writer);
-                await _context.SaveChangesAsync();
+                writersRepository.RemoveWriterAsync(writer);
+                await writersRepository.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch(DbUpdateException)
