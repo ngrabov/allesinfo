@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<allinfo.Models.Article>
 @using Microsoft.AspNetCore.Identity
 @using allinfo.Models
-@using allinfo.Data
 
 @inject SignInManager<Writer> signInManager
 @inject UserManager<Writer> userManager
@@ -130,7 +129,7 @@
                      @{ 
                         var t = ViewData["Scrap"] as List<string>; 
                     }
-                    @for (i = 0; i < 50; i+=5)
+                    @for (i = 0; i < t.Count / 5; i+=5)
                     {
                         <tr>
                             @{j = i / 5 + 1;}

@@ -51,10 +51,6 @@ namespace allinfo.Data
                     results.Add(player.AvatarURL);
                     results.Add(player.Team.AvatarURL);
                 }
-                else
-                {
-                    i++;
-                }
             }
             await SaveAsync();
 
