@@ -37,7 +37,7 @@ namespace allinfo.Data
             var pointrows = dogg2.QuerySelectorAll("td.sortcell").Take(50).ToArray();
 
             List<string> results = new List<string>();
-            IQueryable<Player> playerz = context.Players.AsQueryable();
+            IQueryable<Player> playerz = context.Players.Include(c => c.Team).AsQueryable();
             int i;
             for(i = 0; i < namesrows.Count() ; i++)
             {
@@ -48,6 +48,8 @@ namespace allinfo.Data
                     results.Add(namesrows[i].TextContent);
                     results.Add(pointrows[i].TextContent);
                     results.Add(player.ID.ToString());
+                    results.Add(player.AvatarURL);
+                    results.Add(player.Team.AvatarURL);
                 }
                 else
                 {

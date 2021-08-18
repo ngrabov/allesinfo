@@ -5,7 +5,7 @@
 
 @inject SignInManager<Writer> signInManager
 @inject UserManager<Writer> userManager
-@inject NewsContext context
+
 
 @{
     ViewData["Title"] = "ALLNBA - Your source for all things NBA";
@@ -127,23 +127,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @{ 
+                     @{ 
                         var t = ViewData["Scrap"] as List<string>; 
                     }
-                    @for (i = 0; i < t.Count / 3; i+=3)
+                    @for (i = 0; i < 50; i+=5)
                     {
-                        var player = context.Players.FirstOrDefault(c => c.ID == int.Parse(t[i+2]));
-                        var team = context.Teams.FirstOrDefault(c => c.ID == player.TeamId);
                         <tr>
-                            @{j = i / 3 + 1;}
+                            @{j = i / 5 + 1;}
                             <td>@j</td>
                             <td>
                                 <div class="dot">
-                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@player.AvatarURL" 
+                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@t[i+3]" 
                                         style="width: 35px; height: 35px; object-fit: cover; object-position: 50% 20%; overflow: hidden; border-radius: 50%;" 
                                         alt="Error">
                                 </div>
-                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@team.AvatarURL"
+                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@t[i+4]"
                                     style="width: 20px; height: 20px; object-fit: cover; overflow: hidden; float: right; position: relative;" alt="Error">
                             </td>
                             <td>
@@ -152,25 +150,23 @@
                             </td>
                             <td style="text-align: right;">@t[i+1]</td>
                         </tr>
-                    }   
+                    }    
                 </tbody>
             </table>
             <table class="table table-hover" id="more" style="display: none;">
                 <tbody>
-                    @for(; i < t.Count; i+=3)
+                    @for(; i < t.Count; i+=5)
                     {
-                        var player2 = context.Players.FirstOrDefault(c => c.ID == int.Parse(t[i+2]));
-                        var team2 = context.Teams.FirstOrDefault(c => c.ID == player2.TeamId);
                         <tr>
-                            @{j = i / 3 + 1;}
+                            @{j = i / 5 + 1;}
                             <td>@j</td>
                             <td>
                                 <div class="dot">
-                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@player2.AvatarURL" 
+                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@t[i+3]" 
                                         style="width: 35px; height: 35px; object-fit: cover; object-position: 50% 20%; overflow: hidden; border-radius: 50%;" 
                                         alt="Error">
                                 </div>
-                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@team2.AvatarURL"
+                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@t[i+4]"
                                     style="width: 20px; height: 20px; object-fit: cover; overflow: hidden; float: right; position: relative;" alt="Error">
                             </td>
                             <td>
