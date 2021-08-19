@@ -18,9 +18,9 @@ namespace allinfo.Data
             this.context = context;
         }
 
-        public int CountArticles()
+        public async Task<int> CountArticlesAsync()
         {
-            return context.Articles.Where(c => !c.isModerated).Count();
+            return await context.Articles.Where(c => !c.isModerated).CountAsync();
         }
         
         public async Task<List<Article>> GetArticlesAsync()

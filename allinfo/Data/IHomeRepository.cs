@@ -6,7 +6,7 @@ namespace allinfo.Data
 {
     public interface IHomeRepository
     {
-        int CountArticles();
+        Task<int> CountArticlesAsync();
         Task<List<Article>> GetArticlesAsync();
         Task<List<string>> GetPageDataAsync();
         Task<List<string>> GetVideoDataAsync();

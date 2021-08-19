@@ -17,8 +17,8 @@ namespace allinfo.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var artquery = homeRepository.CountArticles().ToString();
-            ViewBag.cnt = artquery;
+            //var artquery = homeRepository.CountArticlesAsync().ToString();
+            //ViewBag.cnt = artquery;
             var articles = await homeRepository.GetArticlesAsync();
             ViewData["Scrap"] = await homeRepository.GetPageDataAsync();
             ViewData["Video"] = await homeRepository.GetVideoDataAsync();
