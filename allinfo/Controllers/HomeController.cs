@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using allinfo.Models;
 using allinfo.Data;
+using System.IO;
 
 namespace allinfo.Controllers
 {
@@ -17,8 +18,6 @@ namespace allinfo.Controllers
 
         public async Task<IActionResult> Index()
         {
-            //var artquery = homeRepository.CountArticlesAsync().ToString();
-            //ViewBag.cnt = artquery;
             var articles = await homeRepository.GetArticlesAsync();
             ViewData["Scrap"] = await homeRepository.GetPageDataAsync();
             ViewData["Video"] = await homeRepository.GetVideoDataAsync();
