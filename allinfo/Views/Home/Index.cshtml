@@ -8,7 +8,7 @@
 
 @{
     ViewData["Title"] = "ALLNBA - Your source for all things NBA";
-    int i, j;
+    int i;
     var currentUser = await userManager.GetUserAsync(User);
 
     <style media="screen and (max-width:600px)">
@@ -126,53 +126,51 @@
                     </tr>
                 </thead>
                 <tbody>
-                     @{ 
-                        var t = ViewData["Scrap"] as List<string>; 
+                    @{ 
+                        var t = ViewData["Scrap"] as List<Player>; 
                     }
-                    @for (i = 0; i < t.Count / 5; i+=5)
+                    @for (i = 0; i <= 9; i++)
                     {
                         <tr>
-                            @{j = i / 5 + 1;}
-                            <td>@j</td>
+                            <td>@(i+1)</td>
                             <td>
                                 <div class="dot">
-                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@t[i+3]" 
+                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@t[i].AvatarURL" 
                                         style="width: 35px; height: 35px; object-fit: cover; object-position: 50% 20%; overflow: hidden; border-radius: 50%;" 
                                         alt="Error">
                                 </div>
-                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@t[i+4]"
+                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@t[i].Team.AvatarURL"
                                     style="width: 20px; height: 20px; object-fit: cover; overflow: hidden; float: right; position: relative;" alt="Error">
                             </td>
                             <td>
-                                <a asp-controller="Players" asp-action="Details" asp-route-id="@t[i+2]" 
-                                style="color: blue; text-decoration: none;" onmouseover="this.style.color='red'" onmouseout="this.style.color='blue'">@t[i]</a>
+                                <a asp-controller="Players" asp-action="Details" asp-route-id="@t[i].ID" 
+                                style="color: blue; text-decoration: none;" onmouseover="this.style.color='red'" onmouseout="this.style.color='blue'">@t[i].FullName</a>
                             </td>
-                            <td style="text-align: right;">@t[i+1]</td>
+                            <td style="text-align: right;">@t[i].ppg</td>
                         </tr>
                     }    
                 </tbody>
             </table>
             <table class="table table-hover" id="more" style="display: none;">
                 <tbody>
-                    @for(; i < t.Count; i+=5)
+                    @for(; i < t.Count; i++)
                     {
                         <tr>
-                            @{j = i / 5 + 1;}
-                            <td>@j</td>
+                            <td>@(i+1)</td>
                             <td>
                                 <div class="dot">
-                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@t[i+3]" 
+                                    <img class="img lazyload" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_100/@t[i].AvatarURL" 
                                         style="width: 35px; height: 35px; object-fit: cover; object-position: 50% 20%; overflow: hidden; border-radius: 50%;" 
                                         alt="Error">
                                 </div>
-                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@t[i+4]"
+                                <img class="img lazyload" id="tm" data-src="https://res.cloudinary.com/dsjavparg/image/upload/c_fill,h_60,w_60/@t[i].Team.AvatarURL"
                                     style="width: 20px; height: 20px; object-fit: cover; overflow: hidden; float: right; position: relative;" alt="Error">
                             </td>
                             <td>
-                                <a asp-controller="Players" asp-action="Details" asp-route-id="@t[i+2]" style="color: blue; text-decoration: none;" 
-                                onmouseover="this.style.color='red'" onmouseout="this.style.color='blue'">@t[i]</a>
+                                <a asp-controller="Players" asp-action="Details" asp-route-id="@t[i].ID" style="color: blue; text-decoration: none;" 
+                                onmouseover="this.style.color='red'" onmouseout="this.style.color='blue'">@t[i].FullName</a>
                             </td>
-                            <td style="text-align: right;">@t[i+1]</td>
+                            <td style="text-align: right;">@t[i].ppg</td>
                         </tr>
                     }  
                 </tbody>

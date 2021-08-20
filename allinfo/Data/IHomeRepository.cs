@@ -8,7 +8,7 @@ namespace allinfo.Data
     {
         Task<int> CountArticlesAsync();
         Task<List<Article>> GetArticlesAsync();
-        Task<List<string>> GetPageDataAsync();
+        Task<List<Player>> GetPageDataAsync();
         Task<List<string>> GetVideoDataAsync();
         Task<int> SaveAsync();
     }

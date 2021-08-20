@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using allinfo.Models;
 using allinfo.Data;
-using System.IO;
 
 namespace allinfo.Controllers
 {

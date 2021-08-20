@@ -28,33 +28,43 @@ namespace allinfo.Data
             return await context.Articles.Include(c => c.Writer).AsNoTracking().ToListAsync();
         }
 
-        public async Task<List<string>> GetPageDataAsync()
+        public async Task<List<Player>> GetPageDataAsync()
         {
-            var config = Configuration.Default.WithDefaultLoader();
-            var ctx = BrowsingContext.New(config);
-            var dogg2 = await ctx.OpenAsync("http://www.espn.com/nba/seasonleaders/_/league/nba/sort/avgPoints");
-            var namesrows = dogg2.QuerySelectorAll("td[align='left'] a").Take(50).ToArray();
-            var pointrows = dogg2.QuerySelectorAll("td.sortcell").Take(50).ToArray();
-
-            List<string> results = new List<string>();
-            IQueryable<Player> playerz = context.Players.Include(c => c.Team).AsQueryable();
-            int i;
-            for(i = 0; i < namesrows.Count() ; i++)
+            List<Player> results = new List<Player>();
+            if(System.DateTime.Now.Hour == 14)
             {
-                Player player = await playerz.Where(c => c.FullName == namesrows[i].TextContent).FirstOrDefaultAsync();
-                if(player != null)
-                {
-                    player.ppg = double.Parse(pointrows[i].TextContent, CultureInfo.InvariantCulture);
-                    results.Add(namesrows[i].TextContent);
-                    results.Add(pointrows[i].TextContent);
-                    results.Add(player.ID.ToString());
-                    results.Add(player.AvatarURL);
-                    results.Add(player.Team.AvatarURL);
-                }
-            }
-            await SaveAsync();
+                var config = Configuration.Default.WithDefaultLoader();
+                var ctx = BrowsingContext.New(config);
+                var dogg2 = await ctx.OpenAsync("http://www.espn.com/nba/seasonleaders/_/league/nba/sort/avgPoints");
 
-            return results;
+                var namesrows = dogg2.QuerySelectorAll("td[align='left'] a").Take(50).ToArray();
+                List<string> names = new List<string>();
+                foreach(var name in namesrows)
+                {
+                    names.Add(name.TextContent);
+                }
+
+                var pointrows = dogg2.QuerySelectorAll("td.sortcell").Take(50).ToArray();
+                List<string> point = new List<string>();
+                foreach(var item in pointrows)
+                {
+                    point.Add(item.TextContent);
+                }
+
+                context.Players.Include(c => c.Team).Where(c => names.Contains(c.FullName)).ToList().ForEach(d => {
+                    results.Add(d);
+                    int j = names.IndexOf(d.FullName);
+                    d.ppg = double.Parse(point[j], CultureInfo.InvariantCulture);
+                });
+                
+                await SaveAsync();
+            }
+            else
+            {
+                results = await context.Players.Include(c => c.Team).Where(c => c.ppg != 0.0).OrderByDescending(c => c.ppg).Take(50).ToListAsync();
+            }
+
+            return results.OrderByDescending(c => c.ppg).ToList();
         }
 
         public async Task<List<string>> GetVideoDataAsync()
