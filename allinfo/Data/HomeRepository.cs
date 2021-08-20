@@ -45,16 +45,16 @@ namespace allinfo.Data
                 }
 
                 var pointrows = dogg2.QuerySelectorAll("td.sortcell").Take(50).ToArray();
-                List<string> point = new List<string>();
+                List<double> point = new List<double>();
                 foreach(var item in pointrows)
                 {
-                    point.Add(item.TextContent);
+                    point.Add(double.Parse(item.TextContent, CultureInfo.InvariantCulture));
                 }
 
                 context.Players.Include(c => c.Team).Where(c => names.Contains(c.FullName)).ToList().ForEach(d => {
                     results.Add(d);
                     int j = names.IndexOf(d.FullName);
-                    d.ppg = double.Parse(point[j], CultureInfo.InvariantCulture);
+                    d.ppg = point[j];
                 });
                 
                 await SaveAsync();

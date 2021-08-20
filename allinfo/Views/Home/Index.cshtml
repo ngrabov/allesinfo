@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<allinfo.Models.Article>
 @using Microsoft.AspNetCore.Identity
 @using allinfo.Models
+@using System.Globalization
 
 @inject SignInManager<Writer> signInManager
 @inject UserManager<Writer> userManager
@@ -146,7 +147,7 @@
                                 <a asp-controller="Players" asp-action="Details" asp-route-id="@t[i].ID" 
                                 style="color: blue; text-decoration: none;" onmouseover="this.style.color='red'" onmouseout="this.style.color='blue'">@t[i].FullName</a>
                             </td>
-                            <td style="text-align: right;">@t[i].ppg</td>
+                            <td style="text-align: right;">@t[i].ppg.ToString("N1", CultureInfo.InvariantCulture)</td>
                         </tr>
                     }    
                 </tbody>
@@ -170,7 +171,7 @@
                                 <a asp-controller="Players" asp-action="Details" asp-route-id="@t[i].ID" style="color: blue; text-decoration: none;" 
                                 onmouseover="this.style.color='red'" onmouseout="this.style.color='blue'">@t[i].FullName</a>
                             </td>
-                            <td style="text-align: right;">@t[i].ppg</td>
+                            <td style="text-align: right;">@t[i].ppg.ToString("N1", CultureInfo.InvariantCulture)</td>
                         </tr>
                     }  
                 </tbody>
