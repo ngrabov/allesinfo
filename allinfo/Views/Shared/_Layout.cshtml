@@ -6,10 +6,9 @@
     <meta name="Description" content="A simple news-related web page with login and comment system."/>
     <meta name="theme-color" content="#7a3b69">
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" preload media="screen"/>
     <link rel="manifest" href="~/manifest.json">
-    <script src="~/js/fa.js"></script>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css" preload media="screen"/>
     <style>
         a:hover{
             text-decoration: none;
@@ -215,6 +214,7 @@
         }
     </style>
 </head>
+<script src="~/js/fa.js" async></script>
 <body style="background-color: #9a879d;">
     <header style="position: sticky; top: 0; z-index: 1;">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark" style="background-color: #7a3b69; position: sticky; top: 0;">
@@ -281,8 +281,8 @@
             </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js" async></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" async></script>
     <script>
         function dropMe(i){
             if((window.innerWidth) < 576)
