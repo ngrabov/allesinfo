@@ -1,3 +1,5 @@
 .vscode
 allinfo/bin
 allinfo/obj
+allinfo.UnitTests/bin
+allinfo.UnitTests/obj
