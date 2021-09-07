@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace allinfo.UnitTests
 {
-    public class homeRepositoryShould
+    public class HomeRepositoryShould
     {
         [Fact]
         public async Task Test1()
@@ -27,9 +27,6 @@ namespace allinfo.UnitTests
             {
                 var itemsInDatabase = await context.Articles.CountAsync();
                 Assert.Equal(0, itemsInDatabase);
-/* 
-                var item = await context.Articles.FirstAsync();
-                Assert.Equal("Testing?", item.Headline); */
             }
         }
     }
